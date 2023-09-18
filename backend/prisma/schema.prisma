@@ -6,7 +6,8 @@ generator client {
 }
 
 generator typegraphql {
-  provider = "typegraphql-prisma"
+  provider         = "typegraphql-prisma"
+  contextPrismaKey = "p"
 }
 
 datasource db {

@@ -6,13 +6,12 @@ import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import "reflect-metadata";
-import { PrismaClient } from '@prisma/client'
-import { HelloResolver } from "./resolvers/hello";
+import { resolvers } from "@generated/type-graphql";
 import { buildSchema } from "type-graphql";
+import { prisma } from "../lib/dbClient";
 
 
 
-const prisma = new PrismaClient()
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -20,7 +19,7 @@ const main = async () => {
 
     const server = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [HelloResolver],
+            resolvers,
             validate: false,
         }),
         plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
@@ -34,7 +33,7 @@ const main = async () => {
         bodyParser.json(),
 
         expressMiddleware(server, {
-            context: async ({ req }) => ({ token: req.headers.token }),
+            context: async () => ({ prisma }),
         }),
     );
 
