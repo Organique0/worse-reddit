@@ -82,8 +82,8 @@ const main = async () => {
         })
     );
 
-    await new Promise<void>((resolve) => httpServer.listen({ port: 3000 }, resolve));
-    console.log(`🚀 Server ready at http://localhost:3000/`);
+    await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve));
+    console.log(`🚀 Server not at http://localhost:4000/`);
 }
 main()
     .then(async () => {
