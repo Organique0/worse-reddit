@@ -2,10 +2,8 @@ import { Resolver, Query, Arg, Int, Args, Mutation, Ctx } from "type-graphql";
 import { Post } from "@generated/type-graphql";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
+import { MyContext } from "src/types";
 
-type MyContext = {
-    p: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>
-}
 
 @Resolver()
 export class PostResolver {

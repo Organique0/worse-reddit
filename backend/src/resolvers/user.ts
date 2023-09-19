@@ -1,11 +1,13 @@
 import { Resolver, Query, Arg, Int, Args, Mutation, Ctx, InputType, Field, ObjectType } from "type-graphql";
 import { User } from "@generated/type-graphql";
-import { PrismaClient, Prisma } from "@prisma/client";
-import { DefaultArgs } from "@prisma/client/runtime/library";
 import argon2 from "argon2";
+import { MyContext } from "src/types";
 
-type MyContext = {
-    p: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>
+//this is here so that typescript does not complain
+declare module "express-session" {
+    interface Session {
+        userId: number;
+    }
 }
 
 @InputType()
@@ -36,6 +38,8 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+
+
     @Query(() => [User])
     async users(
         @Ctx() { p }: MyContext)
@@ -44,22 +48,36 @@ export class UserResolver {
         return users;
     }
 
-    @Query(() => User, { nullable: true })
+
+    @Query(() => UserResponse, { nullable: true })
     async user(
-        @Arg("id", () => Int) id: number,
-        @Ctx() { p }: MyContext
-    ): Promise<User | null> {
-        return await p.user.findFirst({
-            where: {
-                id
+        @Ctx() { p, req }: MyContext
+    ): Promise<UserResponse | null> {
+
+        if (!req.session.userId) return null;
+
+        try {
+            const user = await p.user.findFirstOrThrow({
+                where: {
+                    id: req.session.userId,
+                }
+            })
+            return { user };
+        } catch (error) {
+            return {
+                errors: [{
+                    field: "username",
+                    message: "There was an error. Maybe the user with this id does not exist?",
+                }]
             }
-        });
+        }
     }
+
 
     @Mutation(() => UserResponse)
     async register(
         @Arg("options") options: UsernamePasswordInput,
-        @Ctx() { p }: MyContext
+        @Ctx() { p, req }: MyContext
     ): Promise<UserResponse> {
 
         if (options.username.length <= 2) {
@@ -102,6 +120,7 @@ export class UserResolver {
                     password: hashedPassword,
                 }
             });
+            req.session.userId = user.id;
             return { user };
         } catch (error) {
             return {
@@ -116,7 +135,7 @@ export class UserResolver {
     @Mutation(() => UserResponse)
     async login(
         @Arg("options") options: UsernamePasswordInput,
-        @Ctx() { p }: MyContext
+        @Ctx() { p, req }: MyContext
     ): Promise<UserResponse> {
         const user = await p.user.findFirst({
             where: {
@@ -141,9 +160,11 @@ export class UserResolver {
                 }]
             }
         }
+        req.session.userId = user.id;
+        //console.log(req.session.id);
 
         return {
-            user
+            user,
         };
     }
 
