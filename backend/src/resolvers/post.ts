@@ -1,26 +1,28 @@
 import { Resolver, Query, Arg, Int, Args, Mutation, Ctx } from "type-graphql";
-import { Post } from "@generated/type-graphql"
+import { Post } from "@generated/type-graphql";
 import { PrismaClient, Prisma } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 
 type MyContext = {
-    prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>
+    p: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>
 }
 
 @Resolver()
 export class PostResolver {
     @Query(() => [Post])
-    async posts({ prisma }: MyContext): Promise<Post[]> {
-        const posts = await prisma.post.findMany();
+    async posts(
+        @Ctx() { p }: MyContext
+    ): Promise<Post[]> {
+        const posts = await p.post.findMany();
         return posts;
     }
 
     @Query(() => Post, { nullable: true })
     async post(
         @Arg("id", () => Int) id: number,
-        { prisma }: MyContext
+        @Ctx() { p }: MyContext
     ): Promise<Post | null> {
-        return await prisma.post.findFirst({
+        return await p.post.findFirst({
             where: {
                 id
             }
@@ -31,9 +33,9 @@ export class PostResolver {
     async createPost(
         @Arg("title") title: string,
         @Arg("text") text: string,
-        @Ctx() { prisma }: MyContext
+        @Ctx() { p }: MyContext
     ): Promise<Post> {
-        return await prisma.post.create({
+        return await p.post.create({
             data: {
                 title,
                 text
@@ -45,9 +47,9 @@ export class PostResolver {
     async updatePost(
         @Arg("title") title: string,
         @Arg("id") id: number,
-        @Ctx() { prisma }: MyContext
+        @Ctx() { p }: MyContext
     ): Promise<Post> {
-        return await prisma.post.update({
+        return await p.post.update({
             where: {
                 id
             },
@@ -59,9 +61,9 @@ export class PostResolver {
     @Mutation(() => Post)
     async deletePost(
         @Arg("id") id: number,
-        @Ctx() { prisma }: MyContext
+        @Ctx() { p }: MyContext
     ): Promise<Boolean> {
-        await prisma.post.delete({
+        await p.post.delete({
             where: {
                 id
             },
