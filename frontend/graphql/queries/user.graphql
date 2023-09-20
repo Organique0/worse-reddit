@@ -1,0 +1,14 @@
+query User {
+  user {
+    user {
+      createdAt
+      id
+      updatedAt
+      username
+    }
+    errors {
+      field
+      message
+    }
+  }
+}

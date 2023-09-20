@@ -3,10 +3,16 @@
 import { CacheProvider } from '@chakra-ui/next-js'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from './theme'
-import { Client, Provider, cacheExchange, fetchExchange } from 'urql';
+import { Client, Provider, cacheExchange, fetchExchange, ssrExchange } from 'urql';
+const isServerSide = typeof window === 'undefined';
+
 
 const client = new Client({
     url: 'http://localhost:4000/',
+    //Cookies do not get set without this line. Thank you for telling me this now.
+    fetchOptions: () => ({
+        credentials: "include",
+    }),
     exchanges: [cacheExchange, fetchExchange],
 
 });
