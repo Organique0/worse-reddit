@@ -1,10 +1,11 @@
 "use client"
-import { useUserQuery } from '@/generated/graphql';
+import { useUserQuery, useLogoutMutation } from '@/generated/graphql';
 import { Box, Button, Flex, Link } from '@chakra-ui/react'
 import NextLink from "next/link" // next link is far superior to regular links
 
 const Navbar = () => {
     const [{ data, fetching }] = useUserQuery();
+    const [{ fetching: LogoutFetching }, logout] = useLogoutMutation();
 
     let body = null;
 
@@ -27,8 +28,8 @@ const Navbar = () => {
         body = (
             <Box display={"flex"}>
                 <Box pr={5}>{data.user?.username}</Box>
-                <Button variant={"link"}>logout</Button>
-            </Box>
+                <Button variant={"link"} isLoading={LogoutFetching} onClick={() => logout({})}>logout</Button>
+            </Box >
         )
     }
 
