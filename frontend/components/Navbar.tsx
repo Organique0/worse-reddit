@@ -26,7 +26,7 @@ const Navbar = () => {
         //I messed up the query...
         body = (
             <Box display={"flex"}>
-                <Box pr={5}>{data.user.user?.username}</Box>
+                <Box pr={5}>{data.user?.username}</Box>
                 <Button variant={"link"}>logout</Button>
             </Box>
         )
