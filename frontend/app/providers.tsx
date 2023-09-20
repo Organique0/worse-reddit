@@ -3,9 +3,18 @@
 import { CacheProvider } from '@chakra-ui/next-js'
 import { ChakraProvider } from '@chakra-ui/react'
 import { theme } from './theme'
-import { Client, Provider, cacheExchange, fetchExchange, ssrExchange } from 'urql';
-const isServerSide = typeof window === 'undefined';
+import { Client, Provider, fetchExchange, } from 'urql';
+import { cacheExchange, Cache, QueryInput } from '@urql/exchange-graphcache';
+import { LoginMutation, RegisterMutation, UserDocument, UserQuery } from '@/generated/graphql';
 
+function betterUpdateQuery<Result, Query>(
+    cache: Cache,
+    qi: QueryInput,
+    result: any,
+    fn: (r: Result, q: Query) => Query
+) {
+    return cache.updateQuery(qi, data => fn(result, data as any) as any);
+}
 
 const client = new Client({
     url: 'http://localhost:4000/',
@@ -13,7 +22,44 @@ const client = new Client({
     fetchOptions: {
         credentials: "include",
     },
-    exchanges: [cacheExchange, fetchExchange],
+    exchanges: [cacheExchange({
+        updates: {
+            Mutation: {
+                login: (_result, args, cache, info) => {
+                    betterUpdateQuery<LoginMutation, UserQuery>(
+                        cache,
+                        { query: UserDocument },
+                        _result,
+                        (result, query) => {
+                            if (result.login.errors) {
+                                return query
+                            } else {
+                                return {
+                                    user: result.login.user
+                                }
+                            }
+                        }
+                    )
+                },
+                register: (_result, args, cache, info) => {
+                    betterUpdateQuery<RegisterMutation, UserQuery>(
+                        cache,
+                        { query: UserDocument },
+                        _result,
+                        (result, query) => {
+                            if (result.register.errors) {
+                                return query
+                            } else {
+                                return {
+                                    user: result.register.user
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }), fetchExchange],
 
 });
 
