@@ -49,28 +49,19 @@ export class UserResolver {
     }
 
 
-    @Query(() => UserResponse, { nullable: true })
+    @Query(() => User, { nullable: true })
     async user(
         @Ctx() { p, req }: MyContext
-    ): Promise<UserResponse | null> {
+    ): Promise<User | null> {
 
         if (!req.session.userId) return null;
 
-        try {
-            const user = await p.user.findFirstOrThrow({
-                where: {
-                    id: req.session.userId,
-                }
-            })
-            return { user };
-        } catch (error) {
-            return {
-                errors: [{
-                    field: "username",
-                    message: "There was an error. Maybe the user with this id does not exist?",
-                }]
+        return await p.user.findFirstOrThrow({
+            where: {
+                id: req.session.userId,
             }
-        }
+        })
+
     }
 
 
