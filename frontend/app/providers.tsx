@@ -9,10 +9,10 @@ const isServerSide = typeof window === 'undefined';
 
 const client = new Client({
     url: 'http://localhost:4000/',
-    //Cookies do not get set without this line. Thank you for telling me this now.
-    fetchOptions: () => ({
+    //Cookies do not get set without this line.
+    fetchOptions: {
         credentials: "include",
-    }),
+    },
     exchanges: [cacheExchange, fetchExchange],
 
 });
