@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Providers } from './providers'
 import { ColorModeScript } from '@chakra-ui/react'
 import { theme } from './theme'
+import Navbar from '@/components/Navbar'
 
 
 export const metadata: Metadata = {
@@ -15,12 +16,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
 
-
   return (
     <html lang="en">
       <body >
         <ColorModeScript initialColorMode={theme.config.initialColorMode} />
         <Providers>
+          <Navbar />
           {children}
         </Providers>
       </body>

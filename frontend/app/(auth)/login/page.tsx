@@ -8,7 +8,7 @@ import {
 import { Formik } from 'formik';
 import { Wrapper } from '@/components/Wrapper';
 import { InputField } from '@/components/InputField';
-import { useLoginMutation } from '@/generated/graphql';
+import { useLoginMutation } from '@/graphql/mutations/login.hooks';
 import { toErrorMap } from '@/utils/toErrorMap';
 import { useRouter } from 'next/navigation';
 
@@ -42,7 +42,6 @@ const Login: React.FC<pageProps> = ({ }) => {
                         } else if (response.data?.login.user) {
                             router.push("/");
                         }
-
                     }}
                 >
                     {({ handleSubmit, isSubmitting }) => (

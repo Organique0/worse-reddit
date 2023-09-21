@@ -5,7 +5,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { theme } from './theme';
 import { useMemo } from 'react';
 import { UrqlProvider, ssrExchange } from '@urql/next';
-import { getClient } from '@/utils/createUrqlClient'
+import { getUrqlClient } from '@/utils/createUrqlClient'
 
 
 export function Providers({
@@ -16,18 +16,20 @@ export function Providers({
 
     const [client, ssr] = useMemo(() => {
         const ssr = ssrExchange();
-        const client = getClient();
+        const client = getUrqlClient();
 
         return [client, ssr];
     }, []);
 
     return (
-        <UrqlProvider client={client} ssr={ssr}>
-            <CacheProvider>
-                <ChakraProvider theme={theme}>
+
+        <CacheProvider>
+            <ChakraProvider theme={theme}>
+                <UrqlProvider client={client} ssr={ssr}>
                     {children}
-                </ChakraProvider>
-            </CacheProvider>
-        </UrqlProvider >
+                </UrqlProvider>
+            </ChakraProvider>
+        </CacheProvider>
+
     )
 }

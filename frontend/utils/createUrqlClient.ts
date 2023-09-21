@@ -1,12 +1,13 @@
+//import { Client, cacheExchange, createClient, fetchExchange } from "urql/core";
 
-import { debugExchange, fetchExchange, createClient, ssrExchange } from '@urql/next';
+
+import { fetchExchange, createClient } from '@urql/next';
 import { cacheExchange } from '@urql/exchange-graphcache';
-import { registerUrql } from '@urql/next/rsc';
-import { LoginMutation, LogoutMutation, RegisterMutation, User, UserDocument, UserQuery } from '@/generated/graphql';
 import { betterUpdateQuery } from './betterUpdateQuery';
+import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation } from '@/graphql/operations';
 
 
-const makeClient = () => {
+export const getUrqlClient = () => {
     return createClient({
         url: 'http://localhost:4000/',
         //Cookies do not get set without this line.
@@ -62,7 +63,4 @@ const makeClient = () => {
             }
         }), fetchExchange],
     });
-};
-
-
-export const { getClient } = registerUrql(makeClient);
+}

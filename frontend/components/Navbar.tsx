@@ -1,11 +1,21 @@
-"use client"
-import { useUserQuery, useLogoutMutation } from '@/generated/graphql';
-import { Box, Button, Flex, Link } from '@chakra-ui/react'
+"use client";
+import { useLogoutMutation } from "@/graphql/mutations/logout.hooks";
+import { useUserQuery } from "@/graphql/queries/user.hooks";
+import { Box, Button, Flex } from '@chakra-ui/react'
 import NextLink from "next/link" // next link is far superior to regular links
+import { useRouter } from "next/navigation";
+
 
 const Navbar = () => {
     const [{ data, fetching }] = useUserQuery();
-    const [{ fetching: LogoutFetching }, logout] = useLogoutMutation();
+    const [, logout] = useLogoutMutation();
+    const router = useRouter();
+
+    function logoutUser() {
+        logout({});
+        router.push("/");
+    }
+
 
     let body = null;
 
@@ -24,11 +34,10 @@ const Navbar = () => {
             </>
         )
     } else {
-        //I messed up the query...
         body = (
             <Box display={"flex"}>
-                <Box pr={5}>{data.user?.username}</Box>
-                <Button variant={"link"} isLoading={LogoutFetching} onClick={() => logout({})}>logout</Button>
+                <Box pr={5}>{data?.user.username}</Box>
+                <Button variant={"link"} isLoading={false} onClick={async () => { await logoutUser() }}>logout</Button>
             </Box >
         )
     }

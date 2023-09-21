@@ -1,21 +1,14 @@
 "use client"
 import { useEffect, useState } from 'react'
 import {
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
-    FormHelperText,
     Box,
     Button,
-    Checkbox,
-    Flex,
-    Input,
     VStack,
 } from '@chakra-ui/react'
 import { Field, Formik } from 'formik';
 import { Wrapper } from '@/components/Wrapper';
 import { InputField } from '@/components/InputField';
-import { useRegisterMutation } from '@/generated/graphql';
+import { useRegisterMutation } from "@/graphql/mutations/register.hooks";
 import { toErrorMap } from '@/utils/toErrorMap';
 import { useRouter } from 'next/navigation';
 
