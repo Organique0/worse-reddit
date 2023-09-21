@@ -7,6 +7,7 @@ import { cacheExchange } from '@urql/exchange-graphcache';
 import { betterUpdateQuery } from './betterUpdateQuery';
 import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation } from '@/graphql/operations';
 
+
 export const getUrqlClient = (ssr: SSRExchange) => {
     return createClient({
         url: 'http://localhost:4000/',

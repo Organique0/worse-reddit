@@ -15,7 +15,7 @@ export function Providers({
 }) {
 
     const [client, ssr] = useMemo(() => {
-        const ssr = ssrExchange();
+        const ssr = ssrExchange({ isClient: true });
         const client = getUrqlClient(ssr);
 
         return [client, ssr];
