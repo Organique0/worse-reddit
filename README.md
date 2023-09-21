@@ -4,6 +4,10 @@ An old tutorial so a lot of changes had to be made but it functions the same.
 
 The most important thing for me was, that it is focused on GraphQl, which exactly what I was looking for.
 
+This is another one of those tutorials that really go deep, explain all the details and do most things by hand.
+The project it self is not even that impressive but it really teaches you a lot.
+And the guy that made it is really good at what he does. He reminds of university professors. He knows his stuff.
+
 I have used Prisma instead of TypeOrm/MicroOrm since it is (for me) much easier to use.
 When I was using TypeOrm it just would not work no matter what. After switching to Prisma it worked first try. That is why I love it.
 
