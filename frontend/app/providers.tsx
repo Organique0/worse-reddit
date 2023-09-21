@@ -16,13 +16,12 @@ export function Providers({
 
     const [client, ssr] = useMemo(() => {
         const ssr = ssrExchange();
-        const client = getUrqlClient();
+        const client = getUrqlClient(ssr);
 
         return [client, ssr];
     }, []);
 
     return (
-
         <CacheProvider>
             <ChakraProvider theme={theme}>
                 <UrqlProvider client={client} ssr={ssr}>

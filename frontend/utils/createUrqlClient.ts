@@ -1,19 +1,20 @@
-//import { Client, cacheExchange, createClient, fetchExchange } from "urql/core";
-
-
-import { fetchExchange, createClient } from '@urql/next';
+//REMEMBER:
+//The main difference between client and server URQL code are the IMPORTS.
+//I don not know exactly why but otherwise it does not work properly
+//This is how it is done in the official documentation
+import { fetchExchange, createClient, SSRExchange } from '@urql/next';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { betterUpdateQuery } from './betterUpdateQuery';
 import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation } from '@/graphql/operations';
 
-
-export const getUrqlClient = () => {
+export const getUrqlClient = (ssr: SSRExchange) => {
     return createClient({
         url: 'http://localhost:4000/',
         //Cookies do not get set without this line.
         fetchOptions: {
             credentials: "include" as const,
         },
+
         exchanges: [cacheExchange({
             updates: {
                 Mutation: {
@@ -61,6 +62,7 @@ export const getUrqlClient = () => {
                     }
                 }
             }
-        }), fetchExchange],
+        }), ssr, fetchExchange],
     });
 }
+//export const { getClient } = registerUrql(getUrqlClient);

@@ -1,9 +1,9 @@
-"use client"
-import { PostsDocument, } from "@/graphql/operations";
-import { getUrqlClient } from "@/utils/createUrqlClient";
+import { PostsDocument } from '@/graphql/operations';
+import { getClient } from '@/utils/createUrqlServer';
+
 
 export default async function Home() {
-  const client = getUrqlClient();
+  const client = getClient();
   const { data, error } = await client.query(PostsDocument, {});
   return (
 
