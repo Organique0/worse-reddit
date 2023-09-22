@@ -62,8 +62,8 @@ const Login: React.FC<pageProps> = ({ }) => {
                                     />
                                 </Box>
                                 <Box ml={"auto"}>
-                                    <NextLink href="/forgot-password">
-                                        <Link>Forgot password</Link>
+                                    <NextLink href="/forgot-password" style={{ textDecoration: "underline" }}>
+                                        Forgot password
                                     </NextLink>
                                 </Box>
                                 <Button type="submit" colorScheme="purple" width="full" mt={4} isLoading={isSubmitting}>
