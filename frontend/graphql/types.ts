@@ -23,6 +23,7 @@ export type FieldError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  changePassword: UserResponse;
   createPost: Post;
   deletePost: Post;
   deleteUser: User;
@@ -32,6 +33,12 @@ export type Mutation = {
   register: UserResponse;
   updatePost: Post;
   updateUser: User;
+};
+
+
+export type MutationChangePasswordArgs = {
+  newPassword: Scalars['String']['input'];
+  token: Scalars['String']['input'];
 };
 
 

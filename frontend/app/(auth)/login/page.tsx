@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import {
     Box,
     Button,
+    Link,
     VStack,
 } from '@chakra-ui/react'
 import { Formik } from 'formik';
@@ -11,7 +12,7 @@ import { InputField } from '@/components/InputField';
 import { useLoginMutation } from '@/graphql/mutations/login.hooks';
 import { toErrorMap } from '@/utils/toErrorMap';
 import { useRouter } from 'next/navigation';
-
+import NextLink from "next/link";
 interface pageProps {
 
 }
@@ -59,6 +60,11 @@ const Login: React.FC<pageProps> = ({ }) => {
                                         placeholder='password'
                                         type='password'
                                     />
+                                </Box>
+                                <Box ml={"auto"}>
+                                    <NextLink href="/forgot-password">
+                                        <Link>Forgot password</Link>
+                                    </NextLink>
                                 </Box>
                                 <Button type="submit" colorScheme="purple" width="full" mt={4} isLoading={isSubmitting}>
                                     Login

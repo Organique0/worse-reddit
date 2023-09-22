@@ -4,6 +4,21 @@ import gql from 'graphql-tag';
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type UserDataFragment = { __typename?: 'User', createdAt: any, id: number, updatedAt: any, username: string };
 
+export type ChangePasswordMutationVariables = Types.Exact<{
+  newPassword: Types.Scalars['String']['input'];
+  token: Types.Scalars['String']['input'];
+}>;
+
+
+export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', createdAt: any, email: string, id: number, updatedAt: any, username: string } | null } };
+
+export type ForgotPasswordMutationVariables = Types.Exact<{
+  email: Types.Scalars['String']['input'];
+}>;
+
+
+export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword: boolean };
+
 export type LoginMutationVariables = Types.Exact<{
   password: Types.Scalars['String']['input'];
   usernameOrEmail: Types.Scalars['String']['input'];
@@ -40,6 +55,28 @@ export const UserDataFragmentDoc = gql`
   id
   updatedAt
   username
+}
+    `;
+export const ChangePasswordDocument = gql`
+    mutation changePassword($newPassword: String!, $token: String!) {
+  changePassword(newPassword: $newPassword, token: $token) {
+    errors {
+      field
+      message
+    }
+    user {
+      createdAt
+      email
+      id
+      updatedAt
+      username
+    }
+  }
+}
+    `;
+export const ForgotPasswordDocument = gql`
+    mutation forgotPassword($email: String!) {
+  forgotPassword(email: $email)
 }
     `;
 export const LoginDocument = gql`

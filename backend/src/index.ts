@@ -5,7 +5,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { createClient } from "redis";
+import { Redis } from "ioredis";
 import session from "express-session";
 import RedisStore from "connect-redis";
 import "reflect-metadata";
@@ -17,7 +17,7 @@ import { prisma } from "../lib/dbClient";
 import { UserResolver } from "./resolvers/user";
 import { PostResolver } from "./resolvers/post";
 import { MyContext } from "./types";
-
+import sendEmail from "../utils/sendEmail";
 
 const main = async () => {
     const app = express();
@@ -31,22 +31,22 @@ const main = async () => {
         })
     );
 
-    // Initialize client.
-    const redisClient = createClient({
-        password: "DX4OZiCgFbHhDEBRaJzfqY9TLhW3qUYG",
-        socket: {
-            host: 'redis-18643.c293.eu-central-1-1.ec2.cloud.redislabs.com',
-            port: 18643
-        }
-    })
-    redisClient.connect().catch(console.error)
+    const redis = new Redis({
+        port: 18643,
+        host: process.env.REDIS_HOST,
+        password: process.env.REDIS_PASSWORD,
+
+    });;
 
     // Initialize store.
     const redisStore = new RedisStore({
-        client: redisClient,
+        client: redis,
         prefix: "myapp:",
         disableTouch: true,
     })
+
+    //await sendEmail("grabnar.luka@gmail.com", "hello world");
+
 
     // Initialize sesssion storage.
     app.use(
@@ -78,12 +78,12 @@ const main = async () => {
 
         bodyParser.json(),
         expressMiddleware(server, {
-            context: async ({ req, res }): Promise<MyContext> => ({ p: prisma, req, res }),
+            context: async ({ req, res }): Promise<MyContext> => ({ p: prisma, req, res, redis }),
         })
     );
 
     await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve));
-    console.log(`🚀 Server not at http://localhost:4000/`);
+    console.log(`🚀 Server at http://localhost:4000/`);
 }
 main()
     .then(async () => {

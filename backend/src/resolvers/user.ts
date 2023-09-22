@@ -1,21 +1,16 @@
-import { Resolver, Query, Arg, Int, Args, Mutation, Ctx, InputType, Field, ObjectType } from "type-graphql";
+import { Resolver, Query, Arg, Int, Args, Mutation, Ctx, Field, ObjectType } from "type-graphql";
 import { User } from "@generated/type-graphql";
 import argon2 from "argon2";
 import { MyContext } from "src/types";
-
+import { UsernamePasswordInput } from "./UsernamePasswordInput";
+import validateRegister from "../../utils/validateRegister";
+import sendEmail from "../../utils/sendEmail";
+import { v4 } from "uuid";
 //this is here so that typescript does not complain
 declare module "express-session" {
     interface Session {
         userId: number;
     }
-}
-
-@InputType()
-class UsernamePasswordInput {
-    @Field()
-    username: string
-    @Field()
-    password: string
 }
 
 @ObjectType()
@@ -38,6 +33,82 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+    @Mutation(() => Boolean)
+    async forgotPassword(
+        @Arg("email") email: string,
+        @Ctx() { p, redis }: MyContext
+    ) {
+        const user = await p.user.findFirst({
+            where: { email: email },
+        });
+        if (!user) return true;
+
+        const token = v4();
+        await redis.set('forgot-password:' + token, user.id, 'EX', 1000 * 60 * 60 * 34 * 3); //store for 3 days
+        sendEmail(email, `
+            <a href="http://localhost:3000/change-password/${token}">Reset Password</a>
+        `)
+
+        return true;
+    }
+
+    @Mutation(() => UserResponse)
+    async changePassword(
+        @Arg("token") token: string,
+        @Arg("newPassword") newPassword: string,
+        @Ctx() { p, redis, req }: MyContext
+    ): Promise<UserResponse> {
+        if (newPassword.length < 5) {
+            return {
+                errors: [{
+                    field: "newPassword",
+                    message: "Password must be at least 5 characters"
+                }]
+            }
+        }
+
+        const userId = await redis.get('forgot-password:' + token)
+        if (!userId) {
+            return {
+                errors: [{
+                    field: 'newPassword',
+                    message: 'token expired',
+                }]
+            }
+        }
+
+        const user = await p.user.findFirst({
+            where: {
+                id: parseInt(userId),
+            }
+        });
+
+        if (!user) {
+            return {
+                errors: [{
+                    field: 'token',
+                    message: 'user no longer exists',
+                }]
+            }
+        }
+
+        user.password = await argon2.hash(newPassword);
+
+        await p.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                password: user.password,
+            }
+        });
+
+        await redis.del('forgot-password:' + token)
+
+        req.session.userId = user.id; // auto login the user
+
+        return { user };
+    }
 
 
     @Query(() => [User])
@@ -70,43 +141,16 @@ export class UserResolver {
         @Arg("options") options: UsernamePasswordInput,
         @Ctx() { p, req }: MyContext
     ): Promise<UserResponse> {
-
-        if (options.username.length <= 2) {
-            return {
-                errors: [{
-                    field: "username",
-                    message: "length must be greater than 2",
-                }]
-            }
-        }
-        if (options.username.length <= 3) {
-            return {
-                errors: [{
-                    field: "password",
-                    message: "length must be greater than 3",
-                }]
-            }
-        }
-
-        const existing = await p.user.findFirst({
-            where: {
-                username: options.username
-            }
-        })
-
-        if (existing) {
-            return {
-                errors: [{
-                    field: 'username',
-                    message: 'Username already exists'
-                }]
-            }
+        const errors = await validateRegister(options, p);
+        if (errors) {
+            return { errors };
         }
 
         try {
             const hashedPassword = await argon2.hash(options.password)
             const user = await p.user.create({
                 data: {
+                    email: options.email,
                     username: options.username,
                     password: hashedPassword,
                 }
@@ -125,24 +169,32 @@ export class UserResolver {
 
     @Mutation(() => UserResponse)
     async login(
-        @Arg("options") options: UsernamePasswordInput,
+        @Arg("usernameOrEmail") usernameOrEmail: string,
+        @Arg("password") password: string,
         @Ctx() { p, req }: MyContext
     ): Promise<UserResponse> {
         const user = await p.user.findFirst({
             where: {
-                username: options.username,
+                OR: [
+                    {
+                        username: usernameOrEmail,
+                    },
+                    {
+                        email: usernameOrEmail
+                    }
+                ]
             }
-        })
+        });
         if (!user) {
             return {
                 errors: [{
-                    field: 'username',
-                    message: 'Username does not exist'
+                    field: 'usernameOrEmail',
+                    message: 'username or email does not exist'
                 }]
             }
         }
 
-        const valid = await argon2.verify(user.password, options.password);
+        const valid = await argon2.verify(user.password, password);
         if (!valid) {
             return {
                 errors: [{
