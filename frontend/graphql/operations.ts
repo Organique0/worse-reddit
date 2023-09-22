@@ -12,6 +12,13 @@ export type ChangePasswordMutationVariables = Types.Exact<{
 
 export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', createdAt: any, email: string, id: number, updatedAt: any, username: string } | null } };
 
+export type CreatePostMutationVariables = Types.Exact<{
+  input: Types.PostInput;
+}>;
+
+
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', createdAt: any, id: number, title: string, updatedAt: any, userId?: number | null, text: string } };
+
 export type ForgotPasswordMutationVariables = Types.Exact<{
   email: Types.Scalars['String']['input'];
 }>;
@@ -71,6 +78,18 @@ export const ChangePasswordDocument = gql`
       updatedAt
       username
     }
+  }
+}
+    `;
+export const CreatePostDocument = gql`
+    mutation CreatePost($input: PostInput!) {
+  createPost(input: $input) {
+    createdAt
+    id
+    title
+    updatedAt
+    userId
+    text
   }
 }
     `;

@@ -1,9 +1,15 @@
-import { Resolver, Query, Arg, Int, Args, Mutation, Ctx } from "type-graphql";
+import { Resolver, Query, Arg, Int, Args, Mutation, Ctx, InputType, Field, UseMiddleware } from "type-graphql";
 import { Post } from "@generated/type-graphql";
-import { PrismaClient, Prisma } from "@prisma/client";
-import { DefaultArgs } from "@prisma/client/runtime/library";
 import { MyContext } from "src/types";
+import { isAuth } from "../middleware/isAuth";
+@InputType()
+class PostInput {
+    @Field()
+    title: string;
 
+    @Field()
+    text: string;
+}
 
 @Resolver()
 export class PostResolver {
@@ -28,15 +34,15 @@ export class PostResolver {
     }
 
     @Mutation(() => Post)
+    @UseMiddleware(isAuth)
     async createPost(
-        @Arg("title") title: string,
-        @Arg("text") text: string,
-        @Ctx() { p }: MyContext
+        @Arg("input") input: PostInput,
+        @Ctx() { p, req }: MyContext
     ): Promise<Post> {
         return await p.post.create({
             data: {
-                title,
-                text
+                ...input,
+                userId: req.session.userId,
             }
         });
     }
