@@ -32,7 +32,7 @@ const Login: React.FC<pageProps> = ({ }) => {
             <Wrapper variant='regular'>
                 <Formik
                     initialValues={{
-                        username: "",
+                        usernameOrEmail: "",
                         password: "",
                     }}
                     onSubmit={async (values, { setErrors }) => {
@@ -48,9 +48,9 @@ const Login: React.FC<pageProps> = ({ }) => {
                         <form onSubmit={handleSubmit}>
                             <VStack p={50}>
                                 <InputField
-                                    name='username'
-                                    label='Username'
-                                    placeholder='username'
+                                    name='usernameOrEmail'
+                                    label='Username or email'
+                                    placeholder='usernameOrEmail'
                                 />
                                 <Box mt={4} width={'full'}>
                                     <InputField

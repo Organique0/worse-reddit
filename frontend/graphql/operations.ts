@@ -5,12 +5,12 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type UserDataFragment = { __typename?: 'User', createdAt: any, id: number, updatedAt: any, username: string };
 
 export type LoginMutationVariables = Types.Exact<{
-  username: Types.Scalars['String']['input'];
   password: Types.Scalars['String']['input'];
+  usernameOrEmail: Types.Scalars['String']['input'];
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', createdAt: any, id: number, updatedAt: any, username: string } | null } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', createdAt: any, email: string, id: number, updatedAt: any, username: string } | null } };
 
 export type LogoutMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -23,8 +23,7 @@ export type PostsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', createdAt: any, id: number, text: string, updatedAt: any, title: string }> };
 
 export type RegisterMutationVariables = Types.Exact<{
-  username: Types.Scalars['String']['input'];
-  password: Types.Scalars['String']['input'];
+  options: Types.UsernamePasswordInput;
 }>;
 
 
@@ -44,18 +43,22 @@ export const UserDataFragmentDoc = gql`
 }
     `;
 export const LoginDocument = gql`
-    mutation Login($username: String!, $password: String!) {
-  login(options: {username: $username, password: $password}) {
+    mutation Login($password: String!, $usernameOrEmail: String!) {
+  login(password: $password, usernameOrEmail: $usernameOrEmail) {
     errors {
       field
       message
     }
     user {
-      ...UserData
+      createdAt
+      email
+      id
+      updatedAt
+      username
     }
   }
 }
-    ${UserDataFragmentDoc}`;
+    `;
 export const LogoutDocument = gql`
     mutation Logout {
   logout
@@ -73,8 +76,8 @@ export const PostsDocument = gql`
 }
     `;
 export const RegisterDocument = gql`
-    mutation Register($username: String!, $password: String!) {
-  register(options: {username: $username, password: $password}) {
+    mutation Register($options: UsernamePasswordInput!) {
+  register(options: $options) {
     errors {
       field
       message

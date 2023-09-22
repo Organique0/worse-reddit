@@ -26,6 +26,7 @@ export type Mutation = {
   createPost: Post;
   deletePost: Post;
   deleteUser: User;
+  forgotPassword: Scalars['Boolean']['output'];
   login: UserResponse;
   logout: Scalars['Boolean']['output'];
   register: UserResponse;
@@ -50,8 +51,14 @@ export type MutationDeleteUserArgs = {
 };
 
 
+export type MutationForgotPasswordArgs = {
+  email: Scalars['String']['input'];
+};
+
+
 export type MutationLoginArgs = {
-  options: UsernamePasswordInput;
+  password: Scalars['String']['input'];
+  usernameOrEmail: Scalars['String']['input'];
 };
 
 
@@ -97,6 +104,7 @@ export type QueryPostArgs = {
 export type User = {
   __typename?: 'User';
   createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   updatedAt: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
@@ -109,6 +117,7 @@ export type UserResponse = {
 };
 
 export type UsernamePasswordInput = {
+  email: Scalars['String']['input'];
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
 };
