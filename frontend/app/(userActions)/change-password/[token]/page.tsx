@@ -2,13 +2,9 @@
 import { InputField } from "@/components/InputField";
 import { Wrapper } from "@/components/Wrapper";
 import { useChangePasswordMutation } from "@/graphql/mutations/changePassword.hooks";
-import { useLogoutMutation } from "@/graphql/mutations/logout.hooks";
-import { LogoutDocument } from "@/graphql/operations";
-import { isServer } from "@/utils/isServer";
 import { toErrorMap } from "@/utils/toErrorMap";
 import { VStack, Button, Box, Link, Flex } from "@chakra-ui/react";
 import { Formik } from "formik";
-import { NextPage } from "next"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import NextLink from "next/link";

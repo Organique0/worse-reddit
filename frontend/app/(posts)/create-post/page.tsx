@@ -2,19 +2,19 @@
 import { InputField } from '@/components/InputField';
 import { Wrapper } from '@/components/Wrapper';
 import { useCreatePostMutation } from '@/graphql/mutations/createPost.hooks';
-import { useLoginMutation } from '@/graphql/mutations/login.hooks';
 import { toErrorMap } from '@/utils/toErrorMap';
-import { VStack, Button, Box, Link } from '@chakra-ui/react';
+import useIsAuth from '@/utils/useIsAuth';
+import { VStack, Button, Box } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
-import NextLink from "next/link";
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 const CreatePost: React.FC<{}> = ({ }) => {
-
+    const router = useRouter();
     const [mouted, setMouted] = useState(false);
     const [, createPost] = useCreatePostMutation();
-    const router = useRouter();
+    //auto redirect if not logged in
+    useIsAuth();
 
     useEffect(() => {
         setMouted(true);
@@ -28,9 +28,10 @@ const CreatePost: React.FC<{}> = ({ }) => {
                         text: "",
                     }}
                     onSubmit={async (values) => {
-                        await createPost({ input: values });
+                        const { error } = await createPost({ input: values });
+
                         router.push("/");
-                        console.log(values);
+                        //console.log(values);
                     }}
                 >
                     {({ isSubmitting }) => (
