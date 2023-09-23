@@ -13,6 +13,7 @@ import { useLoginMutation } from '@/graphql/mutations/login.hooks';
 import { toErrorMap } from '@/utils/toErrorMap';
 import { useRouter } from 'next/navigation';
 import NextLink from "next/link";
+import { useSearchParams } from 'next/navigation'
 interface pageProps {
 
 }
@@ -22,6 +23,8 @@ const Login: React.FC<pageProps> = ({ }) => {
     const [mouted, setMouted] = useState(false);
     const [, login] = useLoginMutation();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const next = searchParams.get("next");
 
     useEffect(() => {
         setMouted(true);
@@ -41,7 +44,11 @@ const Login: React.FC<pageProps> = ({ }) => {
                         if (response.data?.login.errors) {
                             setErrors(toErrorMap(response.data.login.errors))
                         } else if (response.data?.login.user) {
-                            router.push("/");
+                            if (typeof next === "string") {
+                                router.push(next);
+                            } else {
+                                router.push("/");
+                            }
                         }
                     }}
                 >

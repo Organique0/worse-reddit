@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Providers } from './providers'
-import { ColorModeScript } from '@chakra-ui/react'
+import { Box, ColorModeScript } from '@chakra-ui/react'
 import { theme } from './theme'
 import Navbar from '@/components/Navbar'
 
@@ -22,7 +22,14 @@ export default function RootLayout({
         <ColorModeScript initialColorMode={theme.config.initialColorMode} />
         <Providers>
           <Navbar />
-          {children}
+          <Box
+            mt={8}
+            mx="auto"
+            maxW={"800px"}
+            w="100%"
+          >
+            {children}
+          </Box>
         </Providers>
       </body>
     </html>
