@@ -22,8 +22,8 @@ model Post {
   text      String   @db.VarChar(2047)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  User      User?    @relation(fields: [userId], references: [id])
-  userId    Int?
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
 
   @@index([userId])
 }

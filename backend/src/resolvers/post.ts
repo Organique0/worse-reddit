@@ -1,7 +1,8 @@
-import { Resolver, Query, Arg, Int, Args, Mutation, Ctx, InputType, Field, UseMiddleware } from "type-graphql";
-import { Post } from "@generated/type-graphql";
+import { Resolver, Query, Arg, Int, Args, Mutation, Ctx, InputType, Field, UseMiddleware, FieldResolver, Root, ObjectType } from "type-graphql";
+import { Post, User } from "@generated/type-graphql";
 import { MyContext } from "src/types";
 import { isAuth } from "../middleware/isAuth";
+import { randomInt } from "crypto";
 @InputType()
 class PostInput {
     @Field()
@@ -11,14 +12,55 @@ class PostInput {
     text: string;
 }
 
-@Resolver()
+@ObjectType()
+class PaginatedPosts {
+    @Field(() => [Post])
+    posts: Post[];
+    @Field()
+    hasMore: boolean;
+    @Field(() => Number)
+    _id: number;
+}
+
+@Resolver(Post)
 export class PostResolver {
-    @Query(() => [Post])
+    @FieldResolver(() => String)
+    textSnippet(@Root() root: Post) { //INFO: add new field that will only return first 50 characters of a post
+        return root.text.slice(0, 50);
+    }
+    @Query(() => PaginatedPosts)
     async posts(
+        @Arg('limit', () => Int) limit: number,
+        @Arg('cursor', () => String, { nullable: true }) cursor: string | null,
         @Ctx() { p }: MyContext
-    ): Promise<Post[]> {
-        const posts = await p.post.findMany();
-        return posts;
+    ): Promise<PaginatedPosts> {
+        const realLimit = Math.min(50, limit);//limit up to 50
+        const realLimitPlusOne = realLimit + 1;
+
+        const posts = await p.post.findMany({
+            take: realLimitPlusOne, //only returns this many posts
+            //skip: 1, 
+            where: {
+                createdAt: {
+                    lt: cursor ? new Date(cursor) : undefined, //cursor can be null
+                }
+            },
+            orderBy: {
+                createdAt: "desc"
+            },
+            include: {
+                user: true,
+            },
+        });
+
+        //console.log(posts.length);
+        //console.log(realLimitPlusOne);
+        //console.log(posts);
+        return {
+            _id: randomInt(100),
+            posts: posts.slice(0, realLimit),
+            hasMore: posts.length === realLimitPlusOne,
+        };
     }
 
     @Query(() => Post, { nullable: true })

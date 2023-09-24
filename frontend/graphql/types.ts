@@ -165,11 +165,19 @@ export type NestedStringFilter = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type PaginatedPosts = {
+  __typename?: 'PaginatedPosts';
+  _id: Scalars['Float']['output'];
+  hasMore: Scalars['Boolean']['output'];
+  posts: Array<Post>;
+};
+
 export type Post = {
   __typename?: 'Post';
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['Int']['output'];
   text: Scalars['String']['output'];
+  textSnippet: Scalars['String']['output'];
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   userId?: Maybe<Scalars['Int']['output']>;
@@ -202,7 +210,7 @@ export type PostWhereInput = {
 export type Query = {
   __typename?: 'Query';
   post?: Maybe<Post>;
-  posts: Array<Post>;
+  posts: PaginatedPosts;
   user?: Maybe<User>;
   users: Array<User>;
 };
@@ -210,6 +218,12 @@ export type Query = {
 
 export type QueryPostArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type QueryPostsArgs = {
+  cursor?: InputMaybe<Scalars['String']['input']>;
+  limit: Scalars['Int']['input'];
 };
 
 export type StringFilter = {

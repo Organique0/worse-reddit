@@ -12,8 +12,7 @@ const load = async () => {
   const posts = JSON.parse(jsonData);
 
   posts.map(async (post) => {
-    console.log(post);
-    await prisma.$executeRaw`insert into Post (title, text, userId) values (${post.title}, ${post.text}, ${post.userId})`;
+    await prisma.$executeRaw`insert into Post (title, text, userId, createdAt) values (${post.title}, ${post.text}, ${post.userId}, ${post.createdAt})`;
   });
 
   try {

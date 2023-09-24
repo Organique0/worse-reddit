@@ -2,8 +2,8 @@
 //The main difference between client and server URQL code are the IMPORTS.
 //I don not know exactly why but otherwise it does not work properly
 //This is how it is done in the official documentation
-import { fetchExchange, createClient, SSRExchange, Exchange } from '@urql/next';
-import { cacheExchange } from '@urql/exchange-graphcache';
+import { fetchExchange, createClient, SSRExchange, Exchange, stringifyVariables } from '@urql/next';
+import { Resolver, cacheExchange } from '@urql/exchange-graphcache';
 import { } from "@urql/core";
 import { betterUpdateQuery } from './betterUpdateQuery';
 import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation } from '@/graphql/operations';
@@ -24,8 +24,8 @@ export const errorExchange: Exchange = ({ forward }) => (ops$) => {
             const { error } = value
             if (error?.message.includes("not logged in")) {
                 /* 
-                this is the only way I was able to make this work without useRouter hook
-                but, this way is worse since Next router is faster
+               without useRouter hook
+                but, this way is worse, since Next router is faster
                 this should only be used when you want to refresh the page
                 
                 window.location.pathname = "/login";
@@ -93,8 +93,77 @@ export const getUrqlClient = (ssr: SSRExchange) => {
                         )
                     }
                 }
+            },
+            resolvers: {
+                Query: {
+                    posts: simplePagination()
+                }
+            },
+            keys: {
+                PaginatedPosts: () => null,
             }
-        }), ssr, errorExchange, fetchExchange],
+        }), errorExchange, ssr, fetchExchange],
     });
 }
 //export const { getClient } = registerUrql(getUrqlClient);
+
+type MergeMode = 'before' | 'after';
+interface PaginationParams {
+    /** The name of the field argument used to define the page’s offset. */
+    offsetArgument?: string;
+    /** The name of the field argument used to define the page’s length. */
+    limitArgument?: string;
+    /** Flip between forward and backwards pagination.
+     *
+     * @remarks
+     * When set to `'after'`, its default, pages are merged forwards and in order.
+     * When set to `'before'`, pages are merged in reverse, putting later pages
+     * in front of earlier ones.
+     */
+    mergeMode?: MergeMode;
+}
+
+const simplePagination = (): Resolver<any, any, any> => {
+    return (_parent, fieldArgs, cache, info) => {
+        const { parentKey: entityKey, fieldName } = info;
+        //console.log(entityKey, fieldName); => Query posts
+
+        const allFields = cache.inspectFields(entityKey);
+        /*
+        [
+            {
+                fieldKey: 'posts({"cursor":"2023-09-23T20:38:10.505Z","limit":50})',
+                fieldName: 'posts',
+                arguments: { cursor: '2023-09-23T20:38:10.505Z', limit: 50 }
+            }
+        ]
+        */
+        const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`;
+        const isInCache = cache.resolve(cache.resolve(entityKey, fieldKey) as string, "posts");
+        info.partial = !isInCache;
+
+        const fieldInfos = allFields.filter(info => info.fieldName === fieldName);
+        const size = fieldInfos.length;
+        if (size === 0) {
+            return undefined;
+        }
+        let hasMore = true;
+        const results: string[] = [];
+        fieldInfos.forEach(info => {
+            const key = cache.resolve(entityKey, info.fieldKey) as string;
+            const data = cache.resolve(key, "posts") as string[];
+            const _hasMore = cache.resolve(key, "hasMore");
+            if (!_hasMore) {
+                hasMore = _hasMore as boolean;
+            }
+            results.push(...data);
+        })
+
+        return {
+            __typename: "PaginatedPosts",
+            hasMore,
+            results: results,
+        };
+
+    };
+};
