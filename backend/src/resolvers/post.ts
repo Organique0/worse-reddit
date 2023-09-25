@@ -1,5 +1,5 @@
 import { Resolver, Query, Arg, Int, Args, Mutation, Ctx, InputType, Field, UseMiddleware, FieldResolver, Root, ObjectType } from "type-graphql";
-import { Post, User } from "@generated/type-graphql";
+import { User, Post } from "@generated/type-graphql";
 import { MyContext } from "src/types";
 import { isAuth } from "../middleware/isAuth";
 import { randomInt } from "crypto";
@@ -14,13 +14,31 @@ class PostInput {
 
 @ObjectType()
 class PaginatedPosts {
-    @Field(() => [Post])
-    posts: Post[];
+    @Field(() => [PostWithUser])
+    posts: PostWithUser[];
     @Field()
     hasMore: boolean;
     @Field(() => Number)
     _id: number;
 }
+@ObjectType()
+export class PostWithUser {
+    @Field()
+    id: number
+    @Field()
+    title: string
+    @Field()
+    text: string
+    @Field()
+    createdAt: Date
+    @Field()
+    updatedAt: Date
+    @Field()
+    user: User
+    @Field()
+    userId: number
+}
+
 
 @Resolver(Post)
 export class PostResolver {
@@ -28,6 +46,7 @@ export class PostResolver {
     textSnippet(@Root() root: Post) { //INFO: add new field that will only return first 50 characters of a post
         return root.text.slice(0, 50);
     }
+
     @Query(() => PaginatedPosts)
     async posts(
         @Arg('limit', () => Int) limit: number,
@@ -63,14 +82,17 @@ export class PostResolver {
         };
     }
 
-    @Query(() => Post, { nullable: true })
+    @Query(() => PostWithUser, { nullable: true })
     async post(
         @Arg("id", () => Int) id: number,
         @Ctx() { p }: MyContext
-    ): Promise<Post | null> {
+    ): Promise<PostWithUser | null> {
         return await p.post.findFirst({
             where: {
                 id
+            },
+            include: {
+                user: true,
             }
         });
     }

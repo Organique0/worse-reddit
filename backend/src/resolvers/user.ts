@@ -1,11 +1,13 @@
 import { Resolver, Query, Arg, Int, Args, Mutation, Ctx, Field, ObjectType } from "type-graphql";
-import { User } from "@generated/type-graphql";
+import { User, Post } from "@generated/type-graphql";
 import argon2 from "argon2";
 import { MyContext } from "src/types";
 import { UsernamePasswordInput } from "./UsernamePasswordInput";
 import validateRegister from "../../utils/validateRegister";
 import sendEmail from "../../utils/sendEmail";
 import { v4 } from "uuid";
+//import { MyPost } from "./post";
+
 //this is here so that typescript does not complain
 declare module "express-session" {
     interface Session {
@@ -20,6 +22,24 @@ class FieldError {
 
     @Field()
     message: string;
+}
+
+//for some reason the generated types do not have relations
+//so we need to create types ourselves
+@ObjectType()
+class UserWithPosts {
+    @Field()
+    id: number
+    @Field()
+    username: string
+    @Field()
+    email: string
+    @Field()
+    createdAt: Date
+    @Field()
+    updatedAt: Date
+    @Field(() => [Post])
+    posts: Post[]
 }
 
 @ObjectType()
@@ -111,25 +131,32 @@ export class UserResolver {
     }
 
 
-    @Query(() => [User])
+    @Query(() => [UserWithPosts], { nullable: true })
     async users(
         @Ctx() { p }: MyContext)
-        : Promise<User[]> {
-        const users = await p.user.findMany();
+        : Promise<UserWithPosts[]> {
+        const users = await p.user.findMany({
+            include: {
+                posts: true,
+            },
+        });
         return users;
     }
 
 
-    @Query(() => User, { nullable: true })
+    @Query(() => UserWithPosts, { nullable: true })
     async user(
         @Ctx() { p, req }: MyContext
-    ): Promise<User | null> {
+    ): Promise<UserWithPosts | null> {
 
         if (!req.session.userId) return null;
 
         return await p.user.findFirstOrThrow({
             where: {
                 id: req.session.userId,
+            },
+            include: {
+                posts: true,
             }
         })
 
