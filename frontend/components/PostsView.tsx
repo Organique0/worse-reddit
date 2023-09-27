@@ -1,7 +1,7 @@
 "use client"
 
 import { usePostsQuery } from "@/graphql/queries/posts.hooks";
-import { Post } from "@/graphql/types";
+import { Post, PostWithUser } from "@/graphql/types";
 import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react"
 import { randomInt, randomUUID } from "crypto";
 import { useState } from "react";
@@ -10,7 +10,7 @@ import { useState } from "react";
 interface PostsData {
     initialPosts: {
         posts: {
-            posts: Post[];
+            posts: PostWithUser[];
         }
     };
 }
@@ -35,7 +35,7 @@ const PostsView = ({ initialPosts }: PostsData) => {
         //initial data passed from the server
         //and new data dinamicly fetched on the client
         <Stack direction={"column"} spacing={"24px"}>
-            {initialPosts?.posts.posts.map((post: Post) => (
+            {initialPosts?.posts.posts.map((post: PostWithUser) => (
                 <Box key={post.id} p={5} shadow={"md"} borderWidth={"1px"}>
                     <Heading fontSize={"xl"}>{post.title}</Heading>
                     <Text mt={4}>{post.textSnippet} ...</Text>
