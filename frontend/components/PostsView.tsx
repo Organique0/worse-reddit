@@ -30,11 +30,12 @@ const PostsView = ({ initialPosts }: PostsData) => {
         setVariables({ cursor: newCursor, limit: newLimit });
     };
 
+
     return (
         //initial data passed from the server
         //and new data dinamicly fetched on the client
         <Stack direction={"column"} spacing={"24px"}>
-            {initialPosts.posts.posts.map((post: Post) => (
+            {initialPosts?.posts.posts.map((post: Post) => (
                 <Box key={post.id} p={5} shadow={"md"} borderWidth={"1px"}>
                     <Heading fontSize={"xl"}>{post.title}</Heading>
                     <Text mt={4}>{post.textSnippet} ...</Text>

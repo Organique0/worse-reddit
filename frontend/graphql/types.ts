@@ -43,17 +43,6 @@ export type IntFilter = {
   notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
-export type IntNullableFilter = {
-  equals?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
-  in?: InputMaybe<Array<Scalars['Int']['input']>>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  not?: InputMaybe<NestedIntNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   changePassword: UserResponse;
@@ -140,17 +129,6 @@ export type NestedIntFilter = {
   notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
-export type NestedIntNullableFilter = {
-  equals?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
-  in?: InputMaybe<Array<Scalars['Int']['input']>>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  not?: InputMaybe<NestedIntNullableFilter>;
-  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
-};
-
 export type NestedStringFilter = {
   contains?: InputMaybe<Scalars['String']['input']>;
   endsWith?: InputMaybe<Scalars['String']['input']>;
@@ -169,7 +147,7 @@ export type PaginatedPosts = {
   __typename?: 'PaginatedPosts';
   _id: Scalars['Float']['output'];
   hasMore: Scalars['Boolean']['output'];
-  posts: Array<Post>;
+  posts: Array<PostWithUser>;
 };
 
 export type Post = {
@@ -177,10 +155,9 @@ export type Post = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['Int']['output'];
   text: Scalars['String']['output'];
-  textSnippet: Scalars['String']['output'];
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
-  userId?: Maybe<Scalars['Int']['output']>;
+  userId: Scalars['Int']['output'];
 };
 
 export type PostInput = {
@@ -198,21 +175,33 @@ export type PostWhereInput = {
   AND?: InputMaybe<Array<PostWhereInput>>;
   NOT?: InputMaybe<Array<PostWhereInput>>;
   OR?: InputMaybe<Array<PostWhereInput>>;
-  User?: InputMaybe<UserNullableRelationFilter>;
   createdAt?: InputMaybe<DateTimeFilter>;
   id?: InputMaybe<IntFilter>;
   text?: InputMaybe<StringFilter>;
   title?: InputMaybe<StringFilter>;
   updatedAt?: InputMaybe<DateTimeFilter>;
-  userId?: InputMaybe<IntNullableFilter>;
+  user?: InputMaybe<UserRelationFilter>;
+  userId?: InputMaybe<IntFilter>;
+};
+
+export type PostWithUser = {
+  __typename?: 'PostWithUser';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Float']['output'];
+  text: Scalars['String']['output'];
+  textSnippet: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  user: User;
+  userId: Scalars['Float']['output'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  post?: Maybe<Post>;
+  post?: Maybe<PostWithUser>;
   posts: PaginatedPosts;
-  user?: Maybe<User>;
-  users: Array<User>;
+  user?: Maybe<UserWithPosts>;
+  users?: Maybe<Array<UserWithPosts>>;
 };
 
 
@@ -260,7 +249,7 @@ export type UserCountPostsArgs = {
   where?: InputMaybe<PostWhereInput>;
 };
 
-export type UserNullableRelationFilter = {
+export type UserRelationFilter = {
   is?: InputMaybe<UserWhereInput>;
   isNot?: InputMaybe<UserWhereInput>;
 };
@@ -281,6 +270,16 @@ export type UserWhereInput = {
   posts?: InputMaybe<PostListRelationFilter>;
   updatedAt?: InputMaybe<DateTimeFilter>;
   username?: InputMaybe<StringFilter>;
+};
+
+export type UserWithPosts = {
+  __typename?: 'UserWithPosts';
+  createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
+  id: Scalars['Float']['output'];
+  posts: Array<Post>;
+  updatedAt: Scalars['DateTime']['output'];
+  username: Scalars['String']['output'];
 };
 
 export type UsernamePasswordInput = {

@@ -2,8 +2,6 @@ import * as Types from '../graphql/types';
 
 import gql from 'graphql-tag';
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-export type UserDataFragment = { __typename?: 'User', createdAt: any, id: number, updatedAt: any, username: string };
-
 export type ChangePasswordMutationVariables = Types.Exact<{
   newPassword: Types.Scalars['String']['input'];
   token: Types.Scalars['String']['input'];
@@ -17,7 +15,7 @@ export type CreatePostMutationVariables = Types.Exact<{
 }>;
 
 
-export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', createdAt: any, id: number, title: string, updatedAt: any, userId?: number | null, text: string } };
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', createdAt: any, id: number, title: string, updatedAt: any, userId: number, text: string } };
 
 export type ForgotPasswordMutationVariables = Types.Exact<{
   email: Types.Scalars['String']['input'];
@@ -44,7 +42,7 @@ export type RegisterMutationVariables = Types.Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', createdAt: any, id: number, updatedAt: any, username: string } | null } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', username: string, updatedAt: any, id: number, email: string, createdAt: any } | null } };
 
 export type PostsQueryVariables = Types.Exact<{
   limit: Types.Scalars['Int']['input'];
@@ -52,21 +50,14 @@ export type PostsQueryVariables = Types.Exact<{
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'Post', createdAt: any, id: number, text: string, textSnippet: string, title: string, updatedAt: any, userId?: number | null }> } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'PostWithUser', createdAt: any, id: number, text: string, textSnippet: string, title: string, updatedAt: any, userId: number }> } };
 
 export type UserQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', createdAt: any, id: number, updatedAt: any, username: string } | null };
+export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'UserWithPosts', username: string, updatedAt: any, id: number, email: string, createdAt: any, posts: Array<{ __typename?: 'Post', text: string, title: string, updatedAt: any, userId: number, id: number, createdAt: any }> } | null };
 
-export const UserDataFragmentDoc = gql`
-    fragment UserData on User {
-  createdAt
-  id
-  updatedAt
-  username
-}
-    `;
+
 export const ChangePasswordDocument = gql`
     mutation changePassword($newPassword: String!, $token: String!) {
   changePassword(newPassword: $newPassword, token: $token) {
@@ -131,11 +122,15 @@ export const RegisterDocument = gql`
       message
     }
     user {
-      ...UserData
+      username
+      updatedAt
+      id
+      email
+      createdAt
     }
   }
 }
-    ${UserDataFragmentDoc}`;
+    `;
 export const PostsDocument = gql`
     query Posts($limit: Int!, $cursor: String) {
   posts(limit: $limit, cursor: $cursor) {
@@ -156,7 +151,19 @@ export const PostsDocument = gql`
 export const UserDocument = gql`
     query User {
   user {
-    ...UserData
+    username
+    updatedAt
+    posts {
+      text
+      title
+      updatedAt
+      userId
+      id
+      createdAt
+    }
+    id
+    email
+    createdAt
   }
 }
-    ${UserDataFragmentDoc}`;
+    `;

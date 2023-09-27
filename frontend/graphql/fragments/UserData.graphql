@@ -1,6 +1,0 @@
-fragment UserData on User {
-  createdAt
-  id
-  updatedAt
-  username
-}

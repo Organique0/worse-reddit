@@ -27,7 +27,7 @@ class FieldError {
 //for some reason the generated types do not have relations
 //so we need to create types ourselves
 @ObjectType()
-class UserWithPosts {
+export class UserWithPosts {
     @Field()
     id: number
     @Field()

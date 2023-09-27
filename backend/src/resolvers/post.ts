@@ -13,7 +13,7 @@ class PostInput {
 }
 
 @ObjectType()
-class PaginatedPosts {
+export class PaginatedPosts {
     @Field(() => [PostWithUser])
     posts: PostWithUser[];
     @Field()
@@ -40,7 +40,7 @@ export class PostWithUser {
 }
 
 
-@Resolver(Post)
+@Resolver(PostWithUser)
 export class PostResolver {
     @FieldResolver(() => String)
     textSnippet(@Root() root: Post) { //INFO: add new field that will only return first 50 characters of a post
