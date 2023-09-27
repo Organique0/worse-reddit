@@ -24,6 +24,7 @@ model Post {
   updatedAt DateTime @default(now()) @updatedAt
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
+  Updoot    Updoot[]
 
   @@index([userId])
 }
@@ -35,6 +36,18 @@ model User {
   /// @TypeGraphQL.omit(output: true, input: true)
   password  String   @db.VarChar(255)
   posts     Post[]
+  Updoods   Updoot[]
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Updoot {
+  userId Int  @id
+  user   User @relation(fields: [userId], references: [id])
+  postId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  value  Int
+
+  @@index([userId])
+  @@index([postId])
 }

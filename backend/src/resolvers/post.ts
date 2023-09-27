@@ -47,6 +47,50 @@ export class PostResolver {
         return root.text.slice(0, 50);
     }
 
+    @Mutation(() => Boolean)
+    @UseMiddleware(isAuth)
+    async vote(
+        @Arg('postId', () => Int) postId: number,
+        @Arg("value", () => Int) value: number,
+        @Ctx() { req, p }: MyContext
+    ) {
+        const { userId } = req.session
+        const isUpdoot = value !== -1;
+        const realValue = isUpdoot ? 1 : -1;
+
+        /* const updoot = await p.updoot.findFirst({
+            where: {
+                AND: [
+                    {
+                        postId: postId,
+                    },
+                    {
+                        userId: userId,
+                    }
+                ]
+            }
+        }); */
+
+
+        await p.updoot.upsert({
+            where: {
+                userId: userId,
+                postId: postId,
+            },
+            create: {
+                userId: userId,
+                postId: postId,
+                value: realValue,
+            },
+            update: {
+                value: realValue,
+            },
+        });
+
+        return true;
+
+    }
+
     @Query(() => PaginatedPosts)
     async posts(
         @Arg('limit', () => Int) limit: number,
