@@ -83,27 +83,29 @@ export class PostResolver {
         }); */
 
 
-        await p.updoot.upsert({
-            where: {
-                userId: userId,
-                postId: postId,
-            },
-            create: {
-                userId: userId,
-                postId: postId,
-                value: realValue,
-            },
-            update: {
-                value: realValue,
-            },
-        });
+        try {
+            const idString = `${userId}${postId}`;
+            const id = Number(idString);
+            await p.updoot.upsert({
+                where: {
+                    id: id
+                },
+                create: {
+                    id: id,
+                    userId: userId,
+                    postId: postId,
+                    value: realValue,
+                },
+                update: {
+                    value: realValue,
+                },
+            });
+        } catch (error) {
+            console.log(error);
+        }
 
         return true;
 
-
-
-
-        return true;
     }
 
     @Query(() => PaginatedPosts)
@@ -152,8 +154,6 @@ export class PostResolver {
                 points: sumOfUpdoots,
             };
         });
-
-        console.log(postsWithUpdootSumAndTotal);
 
 
         return {

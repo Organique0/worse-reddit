@@ -42,7 +42,8 @@ model User {
 }
 
 model Updoot {
-  userId Int  @id
+  id     Int  @id @default(autoincrement())
+  userId Int
   user   User @relation(fields: [userId], references: [id])
   postId Int
   post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
