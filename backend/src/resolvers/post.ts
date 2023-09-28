@@ -3,6 +3,23 @@ import { User, Post } from "@generated/type-graphql";
 import { MyContext } from "src/types";
 import { isAuth } from "../middleware/isAuth";
 import { randomInt } from "crypto";
+
+
+@ObjectType()
+export class StrippedUser {
+    @Field(() => String)
+    username: string;
+    @Field(() => Number)
+    id: number;
+}
+@ObjectType()
+export class UpdootCount {
+    @Field(() => Number)
+    updoods: number;
+    @Field(() => Number)
+    id: number;
+}
+
 @InputType()
 class PostInput {
     @Field()
@@ -33,10 +50,11 @@ export class PostWithUser {
     createdAt: Date
     @Field()
     updatedAt: Date
+    //i don't know. here I am saying that we only return username and id for a user in the post
     @Field()
-    user: User
+    user: StrippedUser
     @Field()
-    userId: number
+    _count: UpdootCount
 }
 
 
@@ -112,16 +130,37 @@ export class PostResolver {
                 createdAt: "desc"
             },
             include: {
-                user: true,
+                user: {
+                    select: {
+                        username: true,
+                        id: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        updoods: true,
+                    }
+                }
             },
+        });
+
+        //all of this is just because urql wants an id for the _count field
+        const postsWithCountId = posts.map((post) => {
+            return {
+                ...post,
+                _count: {
+                    ...post._count,
+                    id: post.id,
+                },
+            };
         });
 
         //console.log(posts.length);
         //console.log(realLimitPlusOne);
-        //console.log(posts);
+        //console.log(postsWithCountId);
         return {
             _id: randomInt(100),
-            posts: posts.slice(0, realLimit),
+            posts: postsWithCountId.slice(0, realLimit),
             hasMore: posts.length === realLimitPlusOne,
         };
     }
@@ -131,14 +170,38 @@ export class PostResolver {
         @Arg("id", () => Int) id: number,
         @Ctx() { p }: MyContext
     ): Promise<PostWithUser | null> {
-        return await p.post.findFirst({
+        const post = await p.post.findFirst({
             where: {
                 id
             },
             include: {
-                user: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        updoods: true,
+                    }
+                }
             }
         });
+
+        if (!post) return null;
+
+        //all of this is just because urql wants an id for the _count field
+
+        const postWithCountId = {
+            ...post,
+            _count: {
+                ...post._count,
+                id: post.id,
+            },
+        };
+
+        return postWithCountId;
     }
 
     @Mutation(() => Post)

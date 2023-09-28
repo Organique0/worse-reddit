@@ -50,7 +50,7 @@ export type PostsQueryVariables = Types.Exact<{
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'PostWithUser', createdAt: any, id: number, text: string, textSnippet: string, title: string, updatedAt: any, user: { __typename?: 'User', id: number, username: string } }> } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'PostWithUser', createdAt: any, id: number, text: string, textSnippet: string, title: string, updatedAt: any, user: { __typename?: 'StrippedUser', id: number, username: string }, _count: { __typename?: 'UpdootCount', id: number, updoods: number } }> } };
 
 export type UserQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -146,6 +146,10 @@ export const PostsDocument = gql`
       user {
         id
         username
+      }
+      _count {
+        id
+        updoods
       }
     }
   }
