@@ -13,14 +13,16 @@ export default async function Home() {
   const client = getClient();
   const { data } = await client.query(PostsDocument,
     {
-      "limit": 10,
+      "limit": 20,
       "cursor": null,
     }
   );
 
+  //console.log(data.posts.posts[0].user.username);
+
 
   return (
-    <div style={{ height: "300vh" }}>
+    <div style={{ width: "100%" }}>
       <Flex justifyContent={"space-between"} alignItems={"center"} mb={"3em"}>
         <Heading>worse reddit</Heading>
         <Button>

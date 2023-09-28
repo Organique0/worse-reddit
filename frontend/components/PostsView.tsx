@@ -16,7 +16,7 @@ interface PostsData {
 }
 
 const PostsView = ({ initialPosts }: PostsData) => {
-    const [variables, setVariables] = useState({ limit: 15, cursor: null as null | string });
+    const [variables, setVariables] = useState({ limit: 1, cursor: null as null | string });
     //we load additional data on the client after
     const [{ data, fetching }] = usePostsQuery({
         variables
@@ -38,6 +38,7 @@ const PostsView = ({ initialPosts }: PostsData) => {
             {initialPosts?.posts.posts.map((post: PostWithUser) => (
                 <Box key={post.id} p={5} shadow={"md"} borderWidth={"1px"}>
                     <Heading fontSize={"xl"}>{post.title}</Heading>
+                    <Text>Posted by: {post.user.username}</Text>
                     <Text mt={4}>{post.textSnippet} ...</Text>
                 </Box>
             ))}
@@ -49,6 +50,7 @@ const PostsView = ({ initialPosts }: PostsData) => {
             {data && !fetching && data.posts.posts.map((post) => (
                 <Box key={post.id} p={5} shadow={"md"} borderWidth={"1px"}>
                     <Heading fontSize={"xl"}>{post.title}</Heading>
+                    <Text>Posted by: {post.user.username}</Text>
                     <Text mt={4}>{post.textSnippet} ...</Text>
                 </Box>
             ))}

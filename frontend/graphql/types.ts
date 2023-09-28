@@ -55,6 +55,7 @@ export type Mutation = {
   register: UserResponse;
   updatePost: Post;
   updateUser: User;
+  vote: Scalars['Boolean']['output'];
 };
 
 
@@ -107,6 +108,12 @@ export type MutationUpdateUserArgs = {
   username: Scalars['String']['input'];
 };
 
+
+export type MutationVoteArgs = {
+  postId: Scalars['Int']['input'];
+  value: Scalars['Int']['input'];
+};
+
 export type NestedDateTimeFilter = {
   equals?: InputMaybe<Scalars['DateTime']['input']>;
   gt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -152,12 +159,23 @@ export type PaginatedPosts = {
 
 export type Post = {
   __typename?: 'Post';
+  _count?: Maybe<PostCount>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['Int']['output'];
   text: Scalars['String']['output'];
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   userId: Scalars['Int']['output'];
+};
+
+export type PostCount = {
+  __typename?: 'PostCount';
+  Updoot: Scalars['Int']['output'];
+};
+
+
+export type PostCountUpdootArgs = {
+  where?: InputMaybe<UpdootWhereInput>;
 };
 
 export type PostInput = {
@@ -171,10 +189,16 @@ export type PostListRelationFilter = {
   some?: InputMaybe<PostWhereInput>;
 };
 
+export type PostRelationFilter = {
+  is?: InputMaybe<PostWhereInput>;
+  isNot?: InputMaybe<PostWhereInput>;
+};
+
 export type PostWhereInput = {
   AND?: InputMaybe<Array<PostWhereInput>>;
   NOT?: InputMaybe<Array<PostWhereInput>>;
   OR?: InputMaybe<Array<PostWhereInput>>;
+  Updoot?: InputMaybe<UpdootListRelationFilter>;
   createdAt?: InputMaybe<DateTimeFilter>;
   id?: InputMaybe<IntFilter>;
   text?: InputMaybe<StringFilter>;
@@ -229,6 +253,23 @@ export type StringFilter = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdootListRelationFilter = {
+  every?: InputMaybe<UpdootWhereInput>;
+  none?: InputMaybe<UpdootWhereInput>;
+  some?: InputMaybe<UpdootWhereInput>;
+};
+
+export type UpdootWhereInput = {
+  AND?: InputMaybe<Array<UpdootWhereInput>>;
+  NOT?: InputMaybe<Array<UpdootWhereInput>>;
+  OR?: InputMaybe<Array<UpdootWhereInput>>;
+  post?: InputMaybe<PostRelationFilter>;
+  postId?: InputMaybe<IntFilter>;
+  user?: InputMaybe<UserRelationFilter>;
+  userId?: InputMaybe<IntFilter>;
+  value?: InputMaybe<IntFilter>;
+};
+
 export type User = {
   __typename?: 'User';
   _count?: Maybe<UserCount>;
@@ -241,7 +282,13 @@ export type User = {
 
 export type UserCount = {
   __typename?: 'UserCount';
+  Updoods: Scalars['Int']['output'];
   posts: Scalars['Int']['output'];
+};
+
+
+export type UserCountUpdoodsArgs = {
+  where?: InputMaybe<UpdootWhereInput>;
 };
 
 
@@ -257,13 +304,14 @@ export type UserRelationFilter = {
 export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
-  user?: Maybe<User>;
+  user?: Maybe<UserWithPosts>;
 };
 
 export type UserWhereInput = {
   AND?: InputMaybe<Array<UserWhereInput>>;
   NOT?: InputMaybe<Array<UserWhereInput>>;
   OR?: InputMaybe<Array<UserWhereInput>>;
+  Updoods?: InputMaybe<UpdootListRelationFilter>;
   createdAt?: InputMaybe<DateTimeFilter>;
   email?: InputMaybe<StringFilter>;
   id?: InputMaybe<IntFilter>;

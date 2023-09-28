@@ -9,7 +9,10 @@ query Posts($limit: Int!, $cursor: String) {
       textSnippet
       title
       updatedAt
-      userId
+      user {
+        id
+        username
+      }
     }
   }
 }

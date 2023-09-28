@@ -8,7 +8,7 @@ export type ChangePasswordMutationVariables = Types.Exact<{
 }>;
 
 
-export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', createdAt: any, email: string, id: number, updatedAt: any, username: string } | null } };
+export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'UserWithPosts', createdAt: any, email: string, id: number, updatedAt: any, username: string } | null } };
 
 export type CreatePostMutationVariables = Types.Exact<{
   input: Types.PostInput;
@@ -30,7 +30,7 @@ export type LoginMutationVariables = Types.Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', createdAt: any, email: string, id: number, updatedAt: any, username: string } | null } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'UserWithPosts', createdAt: any, email: string, id: number, updatedAt: any, username: string } | null } };
 
 export type LogoutMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -42,7 +42,7 @@ export type RegisterMutationVariables = Types.Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', username: string, updatedAt: any, id: number, email: string, createdAt: any } | null } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'UserWithPosts', username: string, updatedAt: any, id: number, email: string, createdAt: any } | null } };
 
 export type PostsQueryVariables = Types.Exact<{
   limit: Types.Scalars['Int']['input'];
@@ -50,7 +50,7 @@ export type PostsQueryVariables = Types.Exact<{
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'PostWithUser', createdAt: any, id: number, text: string, textSnippet: string, title: string, updatedAt: any, userId: number }> } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'PostWithUser', createdAt: any, id: number, text: string, textSnippet: string, title: string, updatedAt: any, user: { __typename?: 'User', id: number, username: string } }> } };
 
 export type UserQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -143,7 +143,10 @@ export const PostsDocument = gql`
       textSnippet
       title
       updatedAt
-      userId
+      user {
+        id
+        username
+      }
     }
   }
 }

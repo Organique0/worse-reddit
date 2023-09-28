@@ -4,15 +4,18 @@
 //This is how it is done in the official documentation
 import { fetchExchange, createClient, SSRExchange, Exchange, stringifyVariables } from '@urql/next';
 import { Resolver, cacheExchange } from '@urql/exchange-graphcache';
-import { } from "@urql/core";
 import { betterUpdateQuery } from './betterUpdateQuery';
 import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation } from '@/graphql/operations';
 import { pipe, tap } from "wonka";
 import { useRouter } from 'next/navigation';
-import { useUserQuery } from '@/graphql/queries/user.hooks';
-import { useEffect } from 'react';
-import useIsAuth from './useIsAuth';
 
+//since when we get the user, we also get the posts.
+//and because the types for login and register are broken
+//we need to hack our way around this so that we don't get any red underlines that drive me crazy
+//we could also make this work better in general, but no.
+type UserQueryWithoutPosts = Omit<UserQuery, 'user'> & {
+    user?: Omit<UserQuery['user'], 'posts'> | null | undefined;
+};
 
 export const errorExchange: Exchange = ({ forward }) => (ops$) => {
     //useRouter now woks, but only if you remove useMemo when calling getUrqlClient in providers
@@ -50,8 +53,13 @@ export const getUrqlClient = (ssr: SSRExchange) => {
         exchanges: [cacheExchange({
             updates: {
                 Mutation: {
+                    createPost: (_result, args, cache, info) => {
+                        cache.invalidate("Query", 'posts', {
+                            limit: 15
+                        })
+                    },
                     login: (_result, args, cache, info) => {
-                        betterUpdateQuery<LoginMutation, UserQuery>(
+                        betterUpdateQuery<LoginMutation, UserQueryWithoutPosts>(
                             cache,
                             { query: UserDocument },
                             _result,
@@ -67,7 +75,7 @@ export const getUrqlClient = (ssr: SSRExchange) => {
                         )
                     },
                     register: (_result, args, cache, info) => {
-                        betterUpdateQuery<RegisterMutation, UserQuery>(
+                        betterUpdateQuery<RegisterMutation, UserQueryWithoutPosts>(
                             cache,
                             { query: UserDocument },
                             _result,
