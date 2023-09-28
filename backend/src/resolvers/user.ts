@@ -39,7 +39,7 @@ export class UserWithPosts {
     @Field()
     updatedAt: Date
     @Field(() => [Post])
-    posts: Post[]
+    posts?: Post[]
 }
 
 @ObjectType()
@@ -47,8 +47,8 @@ class UserResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[]
 
-    @Field(() => User, { nullable: true })
-    user?: User
+    @Field(() => UserWithPosts, { nullable: true })
+    user?: UserWithPosts
 }
 
 @Resolver(UserWithPosts) //not sure on this
@@ -109,6 +109,9 @@ export class UserResolver {
         const user = await p.user.findFirst({
             where: {
                 id: parseInt(userId),
+            },
+            include: {
+                posts: true,
             }
         });
 
@@ -189,6 +192,7 @@ export class UserResolver {
                     email: options.email,
                     username: options.username,
                     password: hashedPassword,
+                    posts: undefined,
                 }
             });
             req.session.userId = user.id;
@@ -219,6 +223,9 @@ export class UserResolver {
                         email: usernameOrEmail
                     }
                 ]
+            },
+            include: {
+                posts: true
             }
         });
         if (!user) {
