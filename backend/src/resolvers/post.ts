@@ -12,13 +12,6 @@ export class StrippedUser {
     @Field(() => Number)
     id: number;
 }
-@ObjectType()
-export class UpdootCount {
-    @Field(() => Number)
-    updoods: number;
-    @Field(() => Number)
-    id: number;
-}
 
 @InputType()
 class PostInput {
@@ -54,7 +47,7 @@ export class PostWithUser {
     @Field()
     user: StrippedUser
     @Field()
-    _count: UpdootCount
+    points: number
 }
 
 
@@ -90,56 +83,25 @@ export class PostResolver {
         }); */
 
 
-        /*         await p.updoot.upsert({
-                    where: {
-                        userId: userId,
-                        postId: postId,
-                    },
-                    create: {
-                        userId: userId,
-                        postId: postId,
-                        value: realValue,
-                    },
-                    update: {
-                        value: realValue,
-                    },
-                });
-        
-                return true; */
-
-        //Chat gpt is better than me
-
-        const currentUpdoot = await p.updoot.findFirst({
+        await p.updoot.upsert({
             where: {
                 userId: userId,
                 postId: postId,
             },
+            create: {
+                userId: userId,
+                postId: postId,
+                value: realValue,
+            },
+            update: {
+                value: realValue,
+            },
         });
-        if (currentUpdoot) {
-            // Calculate the new value based on the current value
-            const newValue = currentUpdoot.value + realValue;
 
-            // Update the updoot record with the new value
-            await p.updoot.update({
-                where: {
-                    id: currentUpdoot.id,
-                    userId: userId,
-                    postId: postId,
-                },
-                data: {
-                    value: newValue,
-                },
-            });
-        } else {
-            // If the updoot record doesn't exist, create it with the calculated value
-            await p.updoot.create({
-                data: {
-                    userId: userId,
-                    postId: postId,
-                    value: realValue,
-                },
-            });
-        }
+        return true;
+
+
+
 
         return true;
     }
@@ -154,48 +116,49 @@ export class PostResolver {
         const realLimitPlusOne = realLimit + 1;
 
         const posts = await p.post.findMany({
-            take: realLimitPlusOne, //only returns this many posts
-            //skip: 1, 
+            take: realLimitPlusOne, // Only return this many posts
+            // skip: 1,
             where: {
                 createdAt: {
-                    lt: cursor ? new Date(cursor) : undefined, //cursor can be null
-                }
+                    lt: cursor ? new Date(cursor) : undefined, // Cursor can be null
+                },
             },
             orderBy: {
-                createdAt: "desc"
+                createdAt: "desc",
             },
             include: {
                 user: {
                     select: {
                         username: true,
                         id: true,
-                    }
+                    },
                 },
-                _count: {
+                updoods: {
                     select: {
-                        updoods: true,
-                    }
-                }
+                        value: true, // Include the 'value' field from updoots
+                    },
+                },
             },
         });
 
-        //all of this is just because urql wants an id for the _count field
-        const postsWithCountId = posts.map((post) => {
+        // Calculate the sum of 'value' for each post's 'updoots'
+        const postsWithUpdootSumAndTotal = posts.map((post) => {
+            const sumOfUpdoots = post.updoods.reduce((total, updoot) => {
+                return total + updoot.value;
+            }, 0); // Initialize total to 0
+
             return {
                 ...post,
-                _count: {
-                    ...post._count,
-                    id: post.id,
-                },
+                points: sumOfUpdoots,
             };
         });
 
-        //console.log(posts.length);
-        //console.log(realLimitPlusOne);
-        //console.log(postsWithCountId);
+        console.log(postsWithUpdootSumAndTotal);
+
+
         return {
             _id: randomInt(100),
-            posts: postsWithCountId.slice(0, realLimit),
+            posts: postsWithUpdootSumAndTotal.slice(0, realLimit),
             hasMore: posts.length === realLimitPlusOne,
         };
     }
@@ -216,24 +179,23 @@ export class PostResolver {
                         username: true,
                     }
                 },
-                _count: {
+                updoods: {
                     select: {
-                        updoods: true,
-                    }
-                }
+                        value: true, // Include the 'value' field from updoots
+                    },
+                },
             }
         });
 
         if (!post) return null;
 
-        //all of this is just because urql wants an id for the _count field
+        const sumOfUpdoots = post.updoods.reduce((total, updoot) => {
+            return total + updoot.value;
+        }, 0);
 
         const postWithCountId = {
             ...post,
-            _count: {
-                ...post._count,
-                id: post.id,
-            },
+            points: sumOfUpdoots
         };
 
         return postWithCountId;
