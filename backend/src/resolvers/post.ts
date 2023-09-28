@@ -90,23 +90,58 @@ export class PostResolver {
         }); */
 
 
-        await p.updoot.upsert({
+        /*         await p.updoot.upsert({
+                    where: {
+                        userId: userId,
+                        postId: postId,
+                    },
+                    create: {
+                        userId: userId,
+                        postId: postId,
+                        value: realValue,
+                    },
+                    update: {
+                        value: realValue,
+                    },
+                });
+        
+                return true; */
+
+        //Chat gpt is better than me
+
+        const currentUpdoot = await p.updoot.findFirst({
             where: {
                 userId: userId,
                 postId: postId,
             },
-            create: {
-                userId: userId,
-                postId: postId,
-                value: realValue,
-            },
-            update: {
-                value: realValue,
-            },
         });
+        if (currentUpdoot) {
+            // Calculate the new value based on the current value
+            const newValue = currentUpdoot.value + realValue;
+
+            // Update the updoot record with the new value
+            await p.updoot.update({
+                where: {
+                    id: currentUpdoot.id,
+                    userId: userId,
+                    postId: postId,
+                },
+                data: {
+                    value: newValue,
+                },
+            });
+        } else {
+            // If the updoot record doesn't exist, create it with the calculated value
+            await p.updoot.create({
+                data: {
+                    userId: userId,
+                    postId: postId,
+                    value: realValue,
+                },
+            });
+        }
 
         return true;
-
     }
 
     @Query(() => PaginatedPosts)
