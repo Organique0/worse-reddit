@@ -44,13 +44,21 @@ export type RegisterMutationVariables = Types.Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'UserWithPosts', username: string, updatedAt: any, id: number, email: string, createdAt: any } | null } };
 
+export type VoteMutationVariables = Types.Exact<{
+  value: Types.Scalars['Int']['input'];
+  postId: Types.Scalars['Int']['input'];
+}>;
+
+
+export type VoteMutation = { __typename?: 'Mutation', vote: boolean };
+
 export type PostsQueryVariables = Types.Exact<{
   limit: Types.Scalars['Int']['input'];
   cursor?: Types.InputMaybe<Types.Scalars['String']['input']>;
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'PostWithUser', createdAt: any, id: number, text: string, textSnippet: string, title: string, updatedAt: any, user: { __typename?: 'StrippedUser', id: number, username: string }, _count: { __typename?: 'UpdootCount', id: number, updoods: number } }> } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'PostWithUser', id: number, title: string, text: string, createdAt: any, updatedAt: any, points: number, textSnippet: string, user: { __typename?: 'StrippedUser', username: string, id: number } }> } };
 
 export type UserQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -131,27 +139,29 @@ export const RegisterDocument = gql`
   }
 }
     `;
+export const VoteDocument = gql`
+    mutation Vote($value: Int!, $postId: Int!) {
+  vote(value: $value, postId: $postId)
+}
+    `;
 export const PostsDocument = gql`
     query Posts($limit: Int!, $cursor: String) {
   posts(limit: $limit, cursor: $cursor) {
-    hasMore
-    _id
     posts {
-      createdAt
       id
-      text
-      textSnippet
       title
+      text
+      createdAt
       updatedAt
       user {
-        id
         username
-      }
-      _count {
         id
-        updoods
       }
+      points
+      textSnippet
     }
+    hasMore
+    _id
   }
 }
     `;

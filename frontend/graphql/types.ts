@@ -210,9 +210,9 @@ export type PostWhereInput = {
 
 export type PostWithUser = {
   __typename?: 'PostWithUser';
-  _count: UpdootCount;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['Float']['output'];
+  points: Scalars['Float']['output'];
   text: Scalars['String']['output'];
   textSnippet: Scalars['String']['output'];
   title: Scalars['String']['output'];
@@ -257,12 +257,6 @@ export type StrippedUser = {
   __typename?: 'StrippedUser';
   id: Scalars['Float']['output'];
   username: Scalars['String']['output'];
-};
-
-export type UpdootCount = {
-  __typename?: 'UpdootCount';
-  id: Scalars['Float']['output'];
-  updoods: Scalars['Float']['output'];
 };
 
 export type UpdootListRelationFilter = {
