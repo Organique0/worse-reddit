@@ -27,7 +27,7 @@ const PostsView = () => {
     const increaseLimit = () => {
         const newLimit = variables.limit + 10;
         const newCursor = data?.posts.posts[data.posts.posts.length - 1].createdAt
-        setVariables({ cursor: null, limit: newLimit });
+        setVariables({ cursor: newCursor, limit: newLimit });
     };
 
 

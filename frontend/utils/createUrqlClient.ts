@@ -188,7 +188,7 @@ const simplePagination = (): Resolver<any, any, any> => {
         return {
             __typename: "PaginatedPosts",
             hasMore,
-            results: results,
+            posts: results,
         };
 
     };
