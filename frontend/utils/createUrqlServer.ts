@@ -41,16 +41,16 @@ const getUrlServer = () => {
                                         }, */
                 }
             },
-            /*             resolvers: {
-                            Query: {
-                                posts: simplePagination()
-                            }
-                        }, */
+            resolvers: {
+                Query: {
+                    posts: simplePagination()
+                }
+            },
         }), fetchExchange],
     });
 };
 
-export const { getClient } = registerUrql(getUrlServer);
+//export const { getClient } = registerUrql(getUrlServer);
 
 
 

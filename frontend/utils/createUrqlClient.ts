@@ -51,6 +51,14 @@ export const getUrqlClient = (ssr: SSRExchange) => {
         },
 
         exchanges: [cacheExchange({
+            keys: {
+                PaginatedPosts: () => null,
+            },
+            resolvers: {
+                Query: {
+                    posts: simplePagination()
+                }
+            },
             updates: {
                 Mutation: {
                     createPost: (_result, args, cache, info) => {
@@ -133,35 +141,13 @@ export const getUrqlClient = (ssr: SSRExchange) => {
 
                     },
                 },
-                resolvers: {
-                    Query: {
-                        posts: simplePagination()
-                    }
-                },
-                keys: {
-                    PaginatedPosts: () => null,
-                }
+
             }
         }), errorExchange, ssr, fetchExchange],
     });
 }
 //export const { getClient } = registerUrql(getUrqlClient);
 
-type MergeMode = 'before' | 'after';
-interface PaginationParams {
-    /** The name of the field argument used to define the page’s offset. */
-    offsetArgument?: string;
-    /** The name of the field argument used to define the page’s length. */
-    limitArgument?: string;
-    /** Flip between forward and backwards pagination.
-     *
-     * @remarks
-     * When set to `'after'`, its default, pages are merged forwards and in order.
-     * When set to `'before'`, pages are merged in reverse, putting later pages
-     * in front of earlier ones.
-     */
-    mergeMode?: MergeMode;
-}
 
 const simplePagination = (): Resolver<any, any, any> => {
     return (_parent, fieldArgs, cache, info) => {

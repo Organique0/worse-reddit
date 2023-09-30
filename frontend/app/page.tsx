@@ -1,6 +1,5 @@
 import PostsView from '@/components/PostsView';
 import { PostsDocument, VoteMutation, VoteMutationVariables } from '@/graphql/operations';
-import { getClient } from '@/utils/createUrqlServer';
 import { Box, Button, Flex, Heading } from '@chakra-ui/react'
 import Link from 'next/link';
 import gql from 'graphql-tag';
@@ -20,6 +19,8 @@ export default async function Home() {
       }
     ); */
   //initialPosts={data}
+
+
   return (
     <div style={{ width: "100%" }}>
       <Flex justifyContent={"space-between"} alignItems={"center"} mb={"3em"}>

@@ -19,14 +19,14 @@ import SinglePost from "./SinglePost";
 const PostsView = () => {
     const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string });
     //we load additional data on the client after
-    const [{ data, fetching }] = usePostsQuery({
+    const [{ data, fetching, }] = usePostsQuery({
         variables
     });
     //console.log(data);
 
     const increaseLimit = () => {
         const newLimit = variables.limit + 10;
-        //const newCursor = data?.posts.posts[data.posts.posts.length - 1].createdAt
+        const newCursor = data?.posts.posts[data.posts.posts.length - 1].createdAt
         setVariables({ cursor: null, limit: newLimit });
     };
 
