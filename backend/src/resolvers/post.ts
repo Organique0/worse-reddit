@@ -48,6 +48,8 @@ export class PostWithUser {
     user: StrippedUser
     @Field()
     points: number
+    @Field(() => Int, { nullable: true })
+    voteStatus: number | null;
 }
 
 
@@ -138,10 +140,14 @@ export class PostResolver {
                 updoods: {
                     select: {
                         value: true, // Include the 'value' field from updoots
+                        userId: true,
+                        postId: true,
                     },
                 },
             },
         });
+
+
 
         // Calculate the sum of 'value' for each post's 'updoots'
         const postsWithUpdootSumAndTotal = posts.map((post) => {
@@ -149,9 +155,18 @@ export class PostResolver {
                 return total + updoot.value;
             }, 0); // Initialize total to 0
 
+            let voteStatus = null;
+
+            post.updoods.map((updoot) => {
+                if ((updoot.userId === post.userId) && (updoot.postId === post.id)) {
+                    voteStatus = updoot.value
+                }
+            })
+
             return {
                 ...post,
                 points: sumOfUpdoots,
+                voteStatus: voteStatus
             };
         });
 
@@ -181,7 +196,9 @@ export class PostResolver {
                 },
                 updoods: {
                     select: {
-                        value: true, // Include the 'value' field from updoots
+                        value: true,
+                        userId: true,
+                        postId: true
                     },
                 },
             }
@@ -193,9 +210,17 @@ export class PostResolver {
             return total + updoot.value;
         }, 0);
 
+        let voteStatus = null;
+        const x = post.updoods.map((updoot) => {
+            if ((updoot.userId === post.userId) && (updoot.postId === post.id)) {
+                voteStatus = updoot.value
+            }
+        })
+
         const postWithCountId = {
             ...post,
-            points: sumOfUpdoots
+            points: sumOfUpdoots,
+            voteStatus: voteStatus
         };
 
         return postWithCountId;
