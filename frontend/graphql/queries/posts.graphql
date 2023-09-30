@@ -6,6 +6,7 @@ query Posts($limit: Int!, $cursor: String) {
       text
       createdAt
       updatedAt
+      voteStatus
       user {
         username
         id

@@ -22,7 +22,7 @@ export function Providers({
     I don't know useMemo behaves without them
     */
     const [client, ssr] = (() => {
-        const ssr = ssrExchange({ isClient: true });
+        const ssr = ssrExchange({ isClient: false });
         const client = getUrqlClient(ssr);
 
         return [client, ssr];

@@ -52,13 +52,20 @@ export type VoteMutationVariables = Types.Exact<{
 
 export type VoteMutation = { __typename?: 'Mutation', vote: boolean };
 
+export type PostQueryVariables = Types.Exact<{
+  postId: Types.Scalars['Int']['input'];
+}>;
+
+
+export type PostQuery = { __typename?: 'Query', post?: { __typename?: 'PostWithUser', id: number, points: number, voteStatus?: number | null, updatedAt: any, title: string, textSnippet: string, text: string, createdAt: any, user: { __typename?: 'StrippedUser', username: string, id: number } } | null };
+
 export type PostsQueryVariables = Types.Exact<{
   limit: Types.Scalars['Int']['input'];
   cursor?: Types.InputMaybe<Types.Scalars['String']['input']>;
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'PostWithUser', id: number, title: string, text: string, createdAt: any, updatedAt: any, points: number, textSnippet: string, user: { __typename?: 'StrippedUser', username: string, id: number } }> } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PaginatedPosts', hasMore: boolean, _id: number, posts: Array<{ __typename?: 'PostWithUser', id: number, title: string, text: string, createdAt: any, updatedAt: any, voteStatus?: number | null, points: number, textSnippet: string, user: { __typename?: 'StrippedUser', username: string, id: number } }> } };
 
 export type UserQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -144,6 +151,24 @@ export const VoteDocument = gql`
   vote(value: $value, postId: $postId)
 }
     `;
+export const PostDocument = gql`
+    query Post($postId: Int!) {
+  post(id: $postId) {
+    id
+    points
+    user {
+      username
+      id
+    }
+    voteStatus
+    updatedAt
+    title
+    textSnippet
+    text
+    createdAt
+  }
+}
+    `;
 export const PostsDocument = gql`
     query Posts($limit: Int!, $cursor: String) {
   posts(limit: $limit, cursor: $cursor) {
@@ -153,6 +178,7 @@ export const PostsDocument = gql`
       text
       createdAt
       updatedAt
+      voteStatus
       user {
         username
         id

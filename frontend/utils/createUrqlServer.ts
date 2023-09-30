@@ -6,7 +6,8 @@ import { createClient, fetchExchange } from '@urql/core';
 import { registerUrql } from '@urql/next/rsc';
 import { NullArray, Resolver, cacheExchange } from '@urql/exchange-graphcache';
 import { stringifyVariables } from '@urql/core';
-
+import { VoteMutationVariables } from '@/graphql/operations';
+import gql from 'graphql-tag';
 
 const getUrlServer = () => {
     return createClient({
@@ -19,7 +20,25 @@ const getUrlServer = () => {
 
             updates: {
                 Mutation: {
-
+                    /*                     vote: (_result, args, cache, info) => {
+                                            const { postId, value } = args as VoteMutationVariables
+                                            const data = cache.readFragment(gql`
+                                                fragment _ on PostWithUser {
+                                                    id
+                                                    points
+                                                }
+                                                `, { id: postId, points: value });
+                                            console.log(data);
+                                            if (data) {
+                                                const newPoints = (data.points as number) + value;
+                                                cache.writeFragment(gql`
+                                                 fragment __ on PostWithUser {
+                                                   points
+                                                    }
+                                                  `, { id: postId, points: newPoints })
+                                            }
+                    
+                                        }, */
                 }
             },
             /*             resolvers: {

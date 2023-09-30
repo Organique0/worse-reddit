@@ -218,6 +218,7 @@ export type PostWithUser = {
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   user: StrippedUser;
+  voteStatus?: Maybe<Scalars['Int']['output']>;
 };
 
 export type Query = {
@@ -269,6 +270,7 @@ export type UpdootWhereInput = {
   AND?: InputMaybe<Array<UpdootWhereInput>>;
   NOT?: InputMaybe<Array<UpdootWhereInput>>;
   OR?: InputMaybe<Array<UpdootWhereInput>>;
+  id?: InputMaybe<IntFilter>;
   post?: InputMaybe<PostRelationFilter>;
   postId?: InputMaybe<IntFilter>;
   user?: InputMaybe<UserRelationFilter>;

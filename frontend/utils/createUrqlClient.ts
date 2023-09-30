@@ -5,10 +5,10 @@
 import { fetchExchange, createClient, SSRExchange, Exchange, stringifyVariables } from '@urql/next';
 import { Resolver, cacheExchange } from '@urql/exchange-graphcache';
 import { betterUpdateQuery } from './betterUpdateQuery';
-import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation } from '@/graphql/operations';
+import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation, VoteMutationVariables, PostsDocument, PostDocument } from '@/graphql/operations';
 import { pipe, tap } from "wonka";
 import { useRouter } from 'next/navigation';
-
+import gql from 'graphql-tag';
 //since when we get the user, we also get the posts.
 //and because the types for login and register are broken
 //we need to hack our way around this so that we don't get any red underlines that drive me crazy
@@ -101,16 +101,46 @@ export const getUrqlClient = (ssr: SSRExchange) => {
                                 { user: null }
                             )
                         )
+                    },
+                    vote: (_result, args, cache, info) => {
+                        type PostWithUserFragment = {
+                            __typename?: "PostWithUser";
+                            id: number;
+                            points?: number;
+                            voteStatus?: number | null;
+                        };
+
+                        const { postId, value } = args as VoteMutationVariables
+                        const data = cache.readFragment<PostWithUserFragment>(gql`
+                            fragment _ on PostWithUser {
+                                id
+                                points
+                                voteStatus
+                            }
+                            `, { id: postId });
+                        if (data) {
+                            if (data.voteStatus === value) {
+                                return;
+                            }
+                            const newPoints = (data.points as number) + (!data.voteStatus ? 1 : 2) * value;
+                            cache.writeFragment(gql`
+                             fragment __ on PostWithUser {
+                               points
+                               voteStatus
+                                }
+                              `, { id: postId, points: newPoints, voteStatus: value });
+                        }
+
+                    },
+                },
+                resolvers: {
+                    Query: {
+                        posts: simplePagination()
                     }
+                },
+                keys: {
+                    PaginatedPosts: () => null,
                 }
-            },
-            resolvers: {
-                Query: {
-                    posts: simplePagination()
-                }
-            },
-            keys: {
-                PaginatedPosts: () => null,
             }
         }), errorExchange, ssr, fetchExchange],
     });

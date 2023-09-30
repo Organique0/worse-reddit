@@ -8,16 +8,16 @@ import { useState } from "react";
 import SinglePost from "./SinglePost";
 
 
-interface PostsData {
+/* interface PostsData {
     initialPosts: {
         posts: {
             posts: PostWithUser[];
         }
     };
-}
-
-const PostsView = ({ initialPosts }: PostsData) => {
-    const [variables, setVariables] = useState({ limit: 1, cursor: null as null | string });
+} */
+// { initialPosts }: PostsData
+const PostsView = () => {
+    const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string });
     //we load additional data on the client after
     const [{ data, fetching }] = usePostsQuery({
         variables
@@ -26,9 +26,8 @@ const PostsView = ({ initialPosts }: PostsData) => {
 
     const increaseLimit = () => {
         const newLimit = variables.limit + 10;
-        const newCursor = data?.posts.posts[data.posts.posts.length - 1].createdAt
-        //console.log(data?.posts);
-        setVariables({ cursor: newCursor, limit: newLimit });
+        //const newCursor = data?.posts.posts[data.posts.posts.length - 1].createdAt
+        setVariables({ cursor: null, limit: newLimit });
     };
 
 
@@ -36,12 +35,12 @@ const PostsView = ({ initialPosts }: PostsData) => {
         //initial data passed from the server
         //and new data dinamicly fetched on the client
         <Stack direction={"column"} spacing={"24px"}>
-            {initialPosts?.posts.posts.map((post) => (
+            {/*             {initialPosts?.posts.posts.map((post) => (
                 <SinglePost post={post} key={post.id} />
             ))}
             {!initialPosts && (
                 <div>loading server data</div>
-            )}
+            )} */}
 
             {data && !fetching && data.posts.posts.map((post) => (
                 <SinglePost post={post} key={post.id} />
