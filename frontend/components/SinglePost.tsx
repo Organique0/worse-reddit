@@ -1,14 +1,21 @@
+import { useDeletePostMutation } from '@/graphql/mutations/deletePost.hooks';
 import { useVoteMutation } from '@/graphql/mutations/vote.hooks';
+import { useUserQuery } from '@/graphql/queries/user.hooks';
 import { Post, PostWithUser } from '@/graphql/types';
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, ChevronUpIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 
 import { Box, Button, Flex, Heading, Icon, IconButton, Stack, Text, color } from "@chakra-ui/react"
+import Link from 'next/link';
 import { useState } from 'react';
+import { EditDeletePostButtons } from './EditDeletePostButtons';
 
 
 const SinglePost = ({ post }: { post: PostWithUser }) => {
     const [loading, setLoading] = useState<"up-loading" | "down-loading" | "not-loading">("not-loading")
     const [{ fetching, operation }, vote] = useVoteMutation();
+    const [, deletePost] = useDeletePostMutation();
+    const [{ data: user }] = useUserQuery();
+
     return (
         <Flex key={post.id} p={5} shadow={"md"} borderWidth={"1px"}>
             <Flex direction="column" alignItems="center" justifyContent="center" mr={4}>
@@ -30,10 +37,15 @@ const SinglePost = ({ post }: { post: PostWithUser }) => {
                         value: -1
                     })
                     setLoading("not-loading");
-                }} isLoading={loading === "down-loading"} colorScheme={post.voteStatus === -1 ? 'red' : undefined} />
+                }} isLoading={loading === "down-loading"} colorScheme={post.voteStatus === -1 ? 'orange' : undefined} />
             </Flex>
-            <Box>
-                <Heading fontSize={"xl"}>{post.title}</Heading>
+            <Box flex={1} ml={3}>
+                <Flex justifyContent={"space-between"}>
+                    <Link href={"/post/" + post.id}>
+                        <Heading fontSize={"xl"}>{post.title}</Heading>
+                    </Link>
+                    <EditDeletePostButtons id={post.id} userId={post.user.id} />
+                </Flex>
                 <Text>Posted by: {post.user.username}</Text>
                 <Text mt={4}>{post.textSnippet} ...</Text>
             </Box>

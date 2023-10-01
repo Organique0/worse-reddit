@@ -24,10 +24,7 @@ export default async function Home() {
   return (
     <div style={{ width: "100%" }}>
       <Flex justifyContent={"space-between"} alignItems={"center"} mb={"3em"}>
-        <Heading>worse reddit</Heading>
-        <Button>
-          <Link href={"/create-post"}>create post</Link>
-        </Button>
+        <Heading>Latest posts</Heading>
       </Flex>
       <PostsView />
     </div>

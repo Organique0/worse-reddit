@@ -1,7 +1,8 @@
 "use client";
 import { useLogoutMutation } from "@/graphql/mutations/logout.hooks";
 import { useUserQuery } from "@/graphql/queries/user.hooks";
-import { Box, Button, Flex } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading } from '@chakra-ui/react'
+import Link from "next/link";
 import NextLink from "next/link" // next link is far superior to regular links
 import { useRouter } from "next/navigation";
 
@@ -43,10 +44,19 @@ const Navbar = () => {
     }
 
     return (
-        <Flex bg={'tomato'} p={4} position="sticky" top={0} zIndex={666}>
-            <Box ml={'auto'}>
-                {body}
-            </Box>
+        <Flex bg={'tomato'} p={4} position="sticky" top={0} zIndex={666} align={"center"}>
+            <Flex align={"center"} maxW={800} flex={1} m={"auto"}>
+                <Link href="/">
+                    <Heading>worse red dit</Heading>
+                </Link>
+
+                <Flex ml={'auto'} align={"center"} gap={6}>
+                    <Button variant={"unstyled"} bgColor={"purple.200"} px={5} color={"black"}>
+                        <Link href={"/create-post"}>create post</Link>
+                    </Button>
+                    {body}
+                </Flex>
+            </Flex>
         </Flex>
     )
 }

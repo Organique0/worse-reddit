@@ -17,6 +17,13 @@ export type CreatePostMutationVariables = Types.Exact<{
 
 export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', createdAt: any, id: number, title: string, updatedAt: any, userId: number, text: string } };
 
+export type DeletePostMutationVariables = Types.Exact<{
+  id: Types.Scalars['Int']['input'];
+}>;
+
+
+export type DeletePostMutation = { __typename?: 'Mutation', deletePost: boolean };
+
 export type ForgotPasswordMutationVariables = Types.Exact<{
   email: Types.Scalars['String']['input'];
 }>;
@@ -43,6 +50,15 @@ export type RegisterMutationVariables = Types.Exact<{
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'UserWithPosts', username: string, updatedAt: any, id: number, email: string, createdAt: any } | null } };
+
+export type UpdatePostMutationVariables = Types.Exact<{
+  updatePostId: Types.Scalars['Int']['input'];
+  text: Types.Scalars['String']['input'];
+  title: Types.Scalars['String']['input'];
+}>;
+
+
+export type UpdatePostMutation = { __typename?: 'Mutation', updatePost: { __typename?: 'PostWithUser', id: number, title: string, text: string, textSnippet: string } };
 
 export type VoteMutationVariables = Types.Exact<{
   value: Types.Scalars['Int']['input'];
@@ -102,6 +118,11 @@ export const CreatePostDocument = gql`
   }
 }
     `;
+export const DeletePostDocument = gql`
+    mutation deletePost($id: Int!) {
+  deletePost(id: $id)
+}
+    `;
 export const ForgotPasswordDocument = gql`
     mutation forgotPassword($email: String!) {
   forgotPassword(email: $email)
@@ -143,6 +164,16 @@ export const RegisterDocument = gql`
       email
       createdAt
     }
+  }
+}
+    `;
+export const UpdatePostDocument = gql`
+    mutation UpdatePost($updatePostId: Int!, $text: String!, $title: String!) {
+  updatePost(id: $updatePostId, text: $text, title: $title) {
+    id
+    title
+    text
+    textSnippet
   }
 }
     `;

@@ -5,7 +5,7 @@
 import { fetchExchange, createClient, SSRExchange, Exchange, stringifyVariables } from '@urql/next';
 import { Resolver, cacheExchange } from '@urql/exchange-graphcache';
 import { betterUpdateQuery } from './betterUpdateQuery';
-import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation, VoteMutationVariables, PostsDocument, PostDocument } from '@/graphql/operations';
+import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation, VoteMutationVariables, PostsDocument, PostDocument, DeletePostMutation, DeletePostMutationVariables } from '@/graphql/operations';
 import { pipe, tap } from "wonka";
 import { useRouter } from 'next/navigation';
 import gql from 'graphql-tag';
@@ -43,7 +43,9 @@ export const errorExchange: Exchange = ({ forward }) => (ops$) => {
 };
 
 export const getUrqlClient = (ssr: SSRExchange) => {
+
     return createClient({
+
         url: 'http://localhost:4000/',
         //Cookies do not get set without this line.
         fetchOptions: {
@@ -60,10 +62,12 @@ export const getUrqlClient = (ssr: SSRExchange) => {
                 }
             },
             updates: {
+
                 Mutation: {
                     createPost: (_result, args, cache, info) => {
                         const allFields = cache.inspectFields("Query");
                         const fieldInfos = allFields.filter((info) => info.fieldName === "posts");
+                        console.log(fieldInfos);
                         fieldInfos.forEach((info) => {
                             cache.invalidate("Query", 'posts', info.arguments)
                         })
@@ -140,10 +144,13 @@ export const getUrqlClient = (ssr: SSRExchange) => {
                         }
 
                     },
+                    deletePost: (_result, args, cache, info) => {
+                        cache.invalidate({ __typename: "PostWithUser", id: (args as DeletePostMutationVariables).id, })
+                    }
                 },
 
             }
-        }), errorExchange, ssr, fetchExchange],
+        }), errorExchange, fetchExchange],
     });
 }
 //export const { getClient } = registerUrql(getUrqlClient);

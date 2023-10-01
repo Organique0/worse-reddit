@@ -47,13 +47,13 @@ export type Mutation = {
   __typename?: 'Mutation';
   changePassword: UserResponse;
   createPost: Post;
-  deletePost: Post;
+  deletePost: Scalars['Boolean']['output'];
   deleteUser: User;
   forgotPassword: Scalars['Boolean']['output'];
   login: UserResponse;
   logout: Scalars['Boolean']['output'];
   register: UserResponse;
-  updatePost: Post;
+  updatePost: PostWithUser;
   updateUser: User;
   vote: Scalars['Boolean']['output'];
 };
@@ -71,7 +71,7 @@ export type MutationCreatePostArgs = {
 
 
 export type MutationDeletePostArgs = {
-  id: Scalars['Float']['input'];
+  id: Scalars['Int']['input'];
 };
 
 
@@ -97,7 +97,8 @@ export type MutationRegisterArgs = {
 
 
 export type MutationUpdatePostArgs = {
-  id: Scalars['Float']['input'];
+  id: Scalars['Int']['input'];
+  text: Scalars['String']['input'];
   title: Scalars['String']['input'];
 };
 

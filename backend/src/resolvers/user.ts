@@ -237,15 +237,15 @@ export class UserResolver {
             }
         }
 
-        const valid = await argon2.verify(user.password, password);
-        if (!valid) {
-            return {
-                errors: [{
-                    field: 'password',
-                    message: 'Incorrect password'
-                }]
-            }
-        }
+        /*         const valid = await argon2.verify(user.password, password);
+                if (!valid) {
+                    return {
+                        errors: [{
+                            field: 'password',
+                            message: 'Incorrect password'
+                        }]
+                    }
+                } */
         req.session.userId = user.id;
         //console.log(req.session.id);
 

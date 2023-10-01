@@ -50,7 +50,7 @@ const getUrlServer = () => {
     });
 };
 
-//export const { getClient } = registerUrql(getUrlServer);
+export const { getClient } = registerUrql(getUrlServer);
 
 
 

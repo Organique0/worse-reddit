@@ -42,7 +42,7 @@ const PostsView = () => {
                 <div>loading server data</div>
             )} */}
 
-            {data && !fetching && data.posts.posts.map((post) => (
+            {data && !fetching && data.posts.posts.map((post) => !post ? null : (
                 <SinglePost post={post} key={post.id} />
             ))}
             {fetching && (

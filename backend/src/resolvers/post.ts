@@ -240,29 +240,35 @@ export class PostResolver {
         });
     }
 
-    @Mutation(() => Post)
+    @Mutation(() => PostWithUser) // text snippet is on this type already
+    @UseMiddleware(isAuth)
     async updatePost(
         @Arg("title") title: string,
-        @Arg("id") id: number,
-        @Ctx() { p }: MyContext
+        @Arg("text") text: string,
+        @Arg("id", () => Int) id: number,
+        @Ctx() { p, req }: MyContext
     ): Promise<Post> {
         return await p.post.update({
             where: {
-                id
+                id,
+                userId: req.session.userId,
             },
             data: {
-                title
+                title,
+                text
             }
         });
     }
-    @Mutation(() => Post)
+    @Mutation(() => Boolean)
+    @UseMiddleware(isAuth)
     async deletePost(
-        @Arg("id") id: number,
-        @Ctx() { p }: MyContext
+        @Arg("id", () => Int) id: number,
+        @Ctx() { p, req }: MyContext
     ): Promise<Boolean> {
         await p.post.delete({
             where: {
-                id
+                id,
+                userId: req.session.userId
             },
         });
         return true;
