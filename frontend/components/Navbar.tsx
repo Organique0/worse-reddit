@@ -15,6 +15,7 @@ const Navbar = () => {
     function logoutUser() {
         logout({});
         router.push("/");
+
     }
 
 
@@ -38,7 +39,7 @@ const Navbar = () => {
         body = (
             <Box display={"flex"}>
                 <Box pr={5}>{data?.user.username}</Box>
-                <Button variant={"link"} isLoading={false} onClick={async () => { await logoutUser() }}>logout</Button>
+                <Button variant={"link"} isLoading={false} onClick={logoutUser}>logout</Button>
             </Box >
         )
     }

@@ -3,7 +3,7 @@
 //I don not know exactly why but otherwise it does not work properly
 //This is how it is done in the official documentation
 import { fetchExchange, createClient, SSRExchange, Exchange, stringifyVariables } from '@urql/next';
-import { Resolver, cacheExchange } from '@urql/exchange-graphcache';
+import { Resolver, cacheExchange, Cache } from '@urql/exchange-graphcache';
 import { betterUpdateQuery } from './betterUpdateQuery';
 import { LoginMutation, UserQuery, UserDocument, RegisterMutation, LogoutMutation, VoteMutationVariables, PostsDocument, PostDocument, DeletePostMutation, DeletePostMutationVariables } from '@/graphql/operations';
 import { pipe, tap } from "wonka";
@@ -42,6 +42,14 @@ export const errorExchange: Exchange = ({ forward }) => (ops$) => {
     )
 };
 
+function invalidateAllPosts(cache: Cache) {
+    const allFields = cache.inspectFields("Query");
+    const fieldInfos = allFields.filter((info) => info.fieldName === "posts");
+    fieldInfos.forEach((info) => {
+        cache.invalidate("Query", 'posts', info.arguments)
+    })
+}
+
 export const getUrqlClient = (ssr: SSRExchange) => {
 
     return createClient({
@@ -65,12 +73,7 @@ export const getUrqlClient = (ssr: SSRExchange) => {
 
                 Mutation: {
                     createPost: (_result, args, cache, info) => {
-                        const allFields = cache.inspectFields("Query");
-                        const fieldInfos = allFields.filter((info) => info.fieldName === "posts");
-                        console.log(fieldInfos);
-                        fieldInfos.forEach((info) => {
-                            cache.invalidate("Query", 'posts', info.arguments)
-                        })
+                        invalidateAllPosts(cache);
                     },
                     login: (_result, args, cache, info) => {
                         betterUpdateQuery<LoginMutation, UserQueryWithoutPosts>(
@@ -86,7 +89,8 @@ export const getUrqlClient = (ssr: SSRExchange) => {
                                     }
                                 }
                             }
-                        )
+                        );
+                        invalidateAllPosts(cache);
                     },
                     register: (_result, args, cache, info) => {
                         betterUpdateQuery<RegisterMutation, UserQueryWithoutPosts>(
@@ -113,18 +117,19 @@ export const getUrqlClient = (ssr: SSRExchange) => {
                                 { user: null }
                             )
                         )
+                        invalidateAllPosts(cache);
                     },
                     vote: (_result, args, cache, info) => {
-                        type PostWithUserFragment = {
-                            __typename?: "PostWithUser";
+                        type MyPostFragment = {
+                            __typename?: "MyPost";
                             id: number;
                             points?: number;
                             voteStatus?: number | null;
                         };
 
                         const { postId, value } = args as VoteMutationVariables
-                        const data = cache.readFragment<PostWithUserFragment>(gql`
-                            fragment _ on PostWithUser {
+                        const data = cache.readFragment<MyPostFragment>(gql`
+                            fragment _ on MyPost {
                                 id
                                 points
                                 voteStatus
@@ -136,7 +141,7 @@ export const getUrqlClient = (ssr: SSRExchange) => {
                             }
                             const newPoints = (data.points as number) + (!data.voteStatus ? 1 : 2) * value;
                             cache.writeFragment(gql`
-                             fragment __ on PostWithUser {
+                             fragment __ on MyPost {
                                points
                                voteStatus
                                 }
@@ -145,7 +150,7 @@ export const getUrqlClient = (ssr: SSRExchange) => {
 
                     },
                     deletePost: (_result, args, cache, info) => {
-                        cache.invalidate({ __typename: "PostWithUser", id: (args as DeletePostMutationVariables).id, })
+                        cache.invalidate({ __typename: "MyPost", id: (args as DeletePostMutationVariables).id, })
                     }
                 },
 
