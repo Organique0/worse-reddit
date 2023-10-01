@@ -1,20 +1,16 @@
-import { useDeletePostMutation } from '@/graphql/mutations/deletePost.hooks';
-import { useVoteMutation } from '@/graphql/mutations/vote.hooks';
-import { useUserQuery } from '@/graphql/queries/user.hooks';
-import { Post, PostWithUser } from '@/graphql/types';
-import { ChevronDownIcon, ChevronUpIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
-
-import { Box, Button, Flex, Heading, Icon, IconButton, Stack, Text, color } from "@chakra-ui/react"
+import { MyPost, useDeletePostMutation, useUserQuery, useVoteMutation } from '@/graphqlApollo/generated';
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import { Box, Flex, Heading, IconButton, Text } from "@chakra-ui/react";
 import Link from 'next/link';
 import { useState } from 'react';
 import { EditDeletePostButtons } from './EditDeletePostButtons';
 
 
-const SinglePost = ({ post }: { post: PostWithUser }) => {
+const SinglePost = ({ post }: { post: MyPost }) => {
     const [loading, setLoading] = useState<"up-loading" | "down-loading" | "not-loading">("not-loading")
-    const [{ fetching, operation }, vote] = useVoteMutation();
-    const [, deletePost] = useDeletePostMutation();
-    const [{ data: user }] = useUserQuery();
+    const [vote, { loading: postFetching }] = useVoteMutation();
+    const [deletePost] = useDeletePostMutation();
+    const { data: user } = useUserQuery();
 
     return (
         <Flex key={post.id} p={5} shadow={"md"} borderWidth={"1px"}>
@@ -23,8 +19,10 @@ const SinglePost = ({ post }: { post: PostWithUser }) => {
                     if (post.voteStatus === 1) return;
                     setLoading("up-loading");
                     await vote({
-                        postId: post.id,
-                        value: 1
+                        variables: {
+                            postId: post.id,
+                            value: 1
+                        }
                     })
                     setLoading("not-loading")
                 }} isLoading={loading === "up-loading"} colorScheme={post.voteStatus === 1 ? 'green' : undefined} />
@@ -33,8 +31,10 @@ const SinglePost = ({ post }: { post: PostWithUser }) => {
                     if (post.voteStatus === -1) return;
                     setLoading("down-loading");
                     await vote({
-                        postId: post.id,
-                        value: -1
+                        variables: {
+                            postId: post.id,
+                            value: -1
+                        }
                     })
                     setLoading("not-loading");
                 }} isLoading={loading === "down-loading"} colorScheme={post.voteStatus === -1 ? 'orange' : undefined} />

@@ -1,15 +1,14 @@
+"use client"
+
 import { EditDeletePostButtons } from "@/components/EditDeletePostButtons";
-import { PostDocument } from "@/graphql/operations";
-import { getClient } from "@/utils/createUrqlServer";
+import { usePostQuery } from "@/graphqlApollo/generated";
+
 import { Box, Heading } from "@chakra-ui/react";
 
-const Post = async ({ params }: { params: { id: string } }) => {
+const Post = ({ params }: { params: { id: string } }) => {
     const id = parseInt(params.id);
 
-    const client = getClient();
-    const { data, error } = await client.query(PostDocument, {
-        "postId": id,
-    })
+    const { loading, error, data } = usePostQuery({ variables: { postId: id } });
 
     if (error) {
         return <div>{error.message}</div>;

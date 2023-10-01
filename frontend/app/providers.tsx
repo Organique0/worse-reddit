@@ -7,6 +7,8 @@ import { useMemo } from 'react';
 import { UrqlProvider, ssrExchange } from '@urql/next';
 import { getUrqlClient } from '@/utils/createUrqlClient'
 import { useRouter } from 'next/navigation';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import { PaginatedPosts, PostsQuery } from '@/graphqlApollo/generated';
 
 
 export function Providers({
@@ -21,20 +23,46 @@ export function Providers({
     that hook did not have any dependencies
     I don't know useMemo behaves without them
     */
-    const [client, ssr] = (() => {
-        const ssr = ssrExchange({ isClient: false });
-        const client = getUrqlClient(ssr);
+    /*     const [client, ssr] = (() => {
+            const ssr = ssrExchange({ isClient: false });
+            const client = getUrqlClient(ssr);
+    
+            return [client, ssr];
+        })(); 
+        
+        <UrqlProvider client={client} ssr={ssr}></UrqlProvider>
+        */
 
-        return [client, ssr];
-    })();
+    const client = new ApolloClient({
+        uri: 'http://localhost:4000/',
+        credentials: "include",
+        cache: new InMemoryCache({
+            typePolicies: {
+                Query: {
+                    fields: {
+                        posts: {
+                            keyArgs: [],
+                            merge(existing: PaginatedPosts | undefined, incoming: PaginatedPosts): PaginatedPosts {
+                                console.log(existing?.posts, incoming.posts)
+                                return {
+                                    ...incoming,
+                                    posts: [...(existing?.posts || []), ...(incoming?.posts || [])]
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+        }),
+    });
 
 
     return (
         <CacheProvider>
             <ChakraProvider theme={theme}>
-                <UrqlProvider client={client} ssr={ssr}>
+                <ApolloProvider client={client}>
                     {children}
-                </UrqlProvider>
+                </ApolloProvider>
             </ChakraProvider>
         </CacheProvider>
 

@@ -8,9 +8,9 @@ import {
 import { Field, Formik } from 'formik';
 import { Wrapper } from '@/components/Wrapper';
 import { InputField } from '@/components/InputField';
-import { useRegisterMutation } from "@/graphql/mutations/register.hooks";
 import { toErrorMap } from '@/utils/toErrorMap';
 import { useRouter } from 'next/navigation';
+import { useRegisterMutation } from '@/graphqlApollo/generated';
 
 interface pageProps {
 
@@ -19,7 +19,7 @@ interface pageProps {
 
 const Register: React.FC<pageProps> = ({ }) => {
     const [mouted, setMouted] = useState(false);
-    const [, register] = useRegisterMutation();
+    const [register,] = useRegisterMutation();
     const router = useRouter();
 
     useEffect(() => {
@@ -37,7 +37,7 @@ const Register: React.FC<pageProps> = ({ }) => {
                         password: "",
                     }}
                     onSubmit={async (values, { setErrors }) => {
-                        const response = await register({ options: values });
+                        const response = await register({ variables: { options: values } });
                         if (response.data?.register.errors) {
                             setErrors(toErrorMap(response.data.register.errors))
                         } else if (response.data?.register.user) {

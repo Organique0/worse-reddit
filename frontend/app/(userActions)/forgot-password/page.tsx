@@ -1,13 +1,11 @@
 "use client"
 import { InputField } from "@/components/InputField";
 import { Wrapper } from "@/components/Wrapper";
-import { toErrorMap } from "@/utils/toErrorMap";
-import { VStack, Button, Box, Link } from "@chakra-ui/react";
+import { useForgotPasswordMutation } from "@/graphqlApollo/generated";
+import { Box, Button, VStack } from "@chakra-ui/react";
 import { Formik } from "formik";
-import router from "next/router";
-import NextLink from "next/link";
 import { useEffect, useState } from "react";
-import { useForgotPasswordMutation } from "@/graphql/mutations/forgotPassword.hooks";
+
 
 
 export const ForgotPasswordPage: React.FC<{}> = ({ }) => {
@@ -17,7 +15,7 @@ export const ForgotPasswordPage: React.FC<{}> = ({ }) => {
         setMouted(true);
     }, [])
 
-    const [, forgotPassword] = useForgotPasswordMutation();
+    const [forgotPassword] = useForgotPasswordMutation();
 
     return (
         mouted && (
@@ -27,7 +25,7 @@ export const ForgotPasswordPage: React.FC<{}> = ({ }) => {
                         email: "",
                     }}
                     onSubmit={async (values) => {
-                        await forgotPassword(values);
+                        await forgotPassword({ variables: values });
                         setComplet(true);
 
                     }}

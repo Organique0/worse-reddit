@@ -1,6 +1,5 @@
 "use client";
-import { useLogoutMutation } from "@/graphql/mutations/logout.hooks";
-import { useUserQuery } from "@/graphql/queries/user.hooks";
+import { useLogoutMutation, useUserQuery } from '@/graphqlApollo/generated';
 import { Box, Button, Flex, Heading } from '@chakra-ui/react'
 import Link from "next/link";
 import NextLink from "next/link" // next link is far superior to regular links
@@ -8,20 +7,19 @@ import { useRouter } from "next/navigation";
 
 
 const Navbar = () => {
-    const [{ data, fetching }] = useUserQuery();
-    const [, logout] = useLogoutMutation();
+    const { data, loading, refetch } = useUserQuery();
+    const [logout, { loading: logoutFetching }] = useLogoutMutation();
     const router = useRouter();
 
-    function logoutUser() {
-        logout({});
+    async function logoutUser() {
+        await logout();
+        await refetch();
         router.push("/");
-
     }
-
 
     let body = null;
 
-    if (fetching) {
+    if (loading) {
         body = null;
     }
     else if (!data?.user) {

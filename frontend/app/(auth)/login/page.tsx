@@ -9,11 +9,12 @@ import {
 import { Formik } from 'formik';
 import { Wrapper } from '@/components/Wrapper';
 import { InputField } from '@/components/InputField';
-import { useLoginMutation } from '@/graphql/mutations/login.hooks';
+
 import { toErrorMap } from '@/utils/toErrorMap';
 import { useRouter } from 'next/navigation';
 import NextLink from "next/link";
 import { useSearchParams } from 'next/navigation'
+import { useLoginMutation } from '@/graphqlApollo/generated';
 interface pageProps {
 
 }
@@ -21,7 +22,7 @@ interface pageProps {
 
 const Login: React.FC<pageProps> = ({ }) => {
     const [mouted, setMouted] = useState(false);
-    const [, login] = useLoginMutation();
+    const [login] = useLoginMutation();
     const router = useRouter();
     const searchParams = useSearchParams();
     const next = searchParams.get("next");
@@ -40,7 +41,7 @@ const Login: React.FC<pageProps> = ({ }) => {
                         password: "",
                     }}
                     onSubmit={async (values, { setErrors }) => {
-                        const response = await login(values);
+                        const response = await login({ variables: values });
                         if (response.data?.login.errors) {
                             setErrors(toErrorMap(response.data.login.errors))
                         } else if (response.data?.login.user) {

@@ -1,19 +1,19 @@
 "use client";
 import { InputField } from "@/components/InputField";
 import { Wrapper } from "@/components/Wrapper";
-import { useChangePasswordMutation } from "@/graphql/mutations/changePassword.hooks";
 import { toErrorMap } from "@/utils/toErrorMap";
 import { VStack, Button, Box, Link, Flex } from "@chakra-ui/react";
 import { Formik } from "formik";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import NextLink from "next/link";
+import { useChangePasswordMutation } from "@/graphqlApollo/generated";
 
 const ChangePassword = ({ params }: { params: { token: string } }) => {
     const { token } = params;
     const router = useRouter();
     const [tokenError, setTokenError] = useState('');
-    const [, ChangePassword] = useChangePasswordMutation();
+    const [ChangePassword] = useChangePasswordMutation();
     const [mouted, setMouted] = useState(false);
     useEffect(() => {
         setMouted(true);
@@ -27,8 +27,10 @@ const ChangePassword = ({ params }: { params: { token: string } }) => {
                 }}
                 onSubmit={async (values, { setErrors }) => {
                     const response = await ChangePassword({
-                        newPassword: values.newPassword,
-                        token
+                        variables: {
+                            newPassword: values.newPassword,
+                            token
+                        }
                     });
                     if (response.data?.changePassword.errors) {
                         const errorMap = toErrorMap(response.data.changePassword.errors)

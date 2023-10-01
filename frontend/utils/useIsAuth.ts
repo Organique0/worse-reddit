@@ -1,5 +1,5 @@
 "use client";
-import { useUserQuery } from '@/graphql/queries/user.hooks';
+import { useUserQuery } from '@/graphqlApollo/generated';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react'
 
@@ -8,11 +8,11 @@ const useIsAuth = () => {
     const path = usePathname();
 
     //auto redirect if not logged in
-    const [{ data, fetching }] = useUserQuery();
+    const { data, loading } = useUserQuery();
     useEffect(() => {
-        if (!fetching && !data?.user) {
+        if (!loading && !data?.user) {
             router.replace("/login?next=" + path);
         }
-    }, [fetching, data, router]);
+    }, [loading, data, router]);
 }
 export default useIsAuth;

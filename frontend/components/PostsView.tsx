@@ -1,9 +1,7 @@
 "use client"
 
-import { usePostsQuery } from "@/graphql/queries/posts.hooks";
-import { Post, PostWithUser } from "@/graphql/types";
-import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react"
-import { randomInt, randomUUID } from "crypto";
+import { usePostsQuery } from "@/graphqlApollo/generated";
+import { Button, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import SinglePost from "./SinglePost";
 
@@ -17,17 +15,37 @@ import SinglePost from "./SinglePost";
 } */
 // { initialPosts }: PostsData
 const PostsView = () => {
-    const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string });
-    //we load additional data on the client after
-    const [{ data, fetching, }] = usePostsQuery({
-        variables
+    const { data, loading, fetchMore, variables } = usePostsQuery({
+        variables: {
+            limit: 10,
+            cursor: null as null | string
+        },
+        notifyOnNetworkStatusChange: true,
     });
-    //console.log(data);
 
     const increaseLimit = () => {
-        const newLimit = variables.limit + 10;
-        const newCursor = data?.posts.posts[data.posts.posts.length - 1].createdAt
-        setVariables({ cursor: newCursor, limit: newLimit });
+        fetchMore({
+            variables: {
+                limit: variables?.limit,
+                cursor: data?.posts.posts[data.posts.posts.length - 1].createdAt
+            },
+            /*             updateQuery: (prevValue, { fetchMoreResult }) => {
+                            if (!fetchMoreResult) {
+                                return prevValue
+                            }
+                            return {
+                                __typename: "Query",
+                                posts: {
+                                    __typename: "PaginatedPosts",
+                                    hasMore: fetchMoreResult.posts.hasMore,
+                                    posts: [
+                                        ...(prevValue).posts.posts,
+                                        ...(fetchMoreResult).posts.posts
+                                    ]
+                                }
+                            }
+                        } */
+        })
     };
 
 
@@ -42,10 +60,10 @@ const PostsView = () => {
                 <div>loading server data</div>
             )} */}
 
-            {data && !fetching && data.posts.posts.map((post) => !post ? null : (
+            {data && !loading && data.posts.posts.map((post) => !post ? null : (
                 <SinglePost post={post} key={post.id} />
             ))}
-            {fetching && (
+            {loading && (
                 <div>loading client data</div>
             )}
             {data && data.posts.hasMore && (

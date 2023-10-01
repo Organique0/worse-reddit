@@ -1,24 +1,9 @@
 import PostsView from '@/components/PostsView';
-import { PostsDocument, VoteMutation, VoteMutationVariables } from '@/graphql/operations';
-import { Box, Button, Flex, Heading } from '@chakra-ui/react'
-import Link from 'next/link';
-import gql from 'graphql-tag';
+import { Flex, Heading } from '@chakra-ui/react'
+
 export const revalidate = 0;
 
 export default async function Home() {
-  //If I am not mistaken, this is how you get client in a server component
-
-  //you can fetch the posts on the server
-  //I do not know how to update cache if this is used this way
-
-  /*   const client = getClient();
-    const { data } = await client.query(PostsDocument,
-      {
-        "limit": 0,
-        "cursor": null,
-      }
-    ); */
-  //initialPosts={data}
 
 
   return (

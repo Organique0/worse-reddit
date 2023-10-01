@@ -1,6 +1,5 @@
 "use client"
-import { useDeletePostMutation } from '@/graphql/mutations/deletePost.hooks';
-import { useUserQuery } from '@/graphql/queries/user.hooks';
+import { useDeletePostMutation, useUserQuery } from '@/graphqlApollo/generated';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { IconButton, Flex } from '@chakra-ui/react';
 import Link from 'next/link';
@@ -12,8 +11,8 @@ interface EditDeletePostButtonsProps {
 }
 
 export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({ id, userId }) => {
-    const [, deletePost] = useDeletePostMutation();
-    const [{ data: user }] = useUserQuery();
+    const [deletePost] = useDeletePostMutation();
+    const { data: user } = useUserQuery();
 
     if (user?.user?.id !== userId) {
         return null
@@ -24,7 +23,7 @@ export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({ id
                 <IconButton icon={<EditIcon />} aria-label="delete post" />
             </Link>
             <IconButton icon={<DeleteIcon />} aria-label="delete post" colorScheme='red' onClick={() => {
-                deletePost({ id: id })
+                deletePost({ variables: { id } })
             }} />
         </Flex>
     );

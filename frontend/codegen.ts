@@ -6,34 +6,13 @@ const config: CodegenConfig = {
   schema: "http://localhost:4000/",
   documents: "./graphql/**/*.graphql",
   generates: {
-    "graphql/types.ts": { plugins: ["typescript"] },
-    // generate operations.ts
-    "graphql/operations.ts": {
-      preset: "import-types",
-      plugins: ["typescript-operations", "typescript-urql"],
-      presetConfig: {
-        typesPath: "../graphql/types",
-      },
+    'graphqlApollo/generated.tsx': {
+      plugins: ['typescript', 'typescript-operations', 'typescript-react-apollo'],
       config: {
-        withHooks: false,
+        withHooks: true
       },
     },
-    hooks: {
-      overwrite: true,
-      preset: "near-operation-file",
-      presetConfig: {
-        extension: ".hooks.tsx",
-        baseTypesPath: "../graphql/types",
-      },
-      plugins: ['typescript-urql'],
-      config: {
-        withHooks: true,
-        importOperationTypesFrom: "Operations",
-        documentMode: "external",
-        importDocumentNodeExternallyFrom: "@/graphql/operations.ts",
-      },
-    },
-  },
+  }
 };
 
 export default config;

@@ -1,8 +1,7 @@
 "use client"
 import { InputField } from "@/components/InputField";
 import { Wrapper } from "@/components/Wrapper";
-import { useUpdatePostMutation } from "@/graphql/mutations/updatePost.hooks";
-import { usePostQuery } from "@/graphql/queries/post.hooks";
+import { usePostQuery, useUpdatePostMutation } from "@/graphqlApollo/generated";
 import useIsAuth from "@/utils/useIsAuth";
 import { Box, Button, VStack } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
@@ -12,9 +11,9 @@ import { useEffect, useState } from "react";
 const EditPostPage = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const [mouted, setMouted] = useState(false);
-    const [, updatePost] = useUpdatePostMutation();
+    const [updatePost] = useUpdatePostMutation();
 
-    const [{ data }] = usePostQuery({
+    const { data } = usePostQuery({
         variables: {
             postId: parseInt(params.id)
         }
@@ -42,7 +41,7 @@ const EditPostPage = ({ params }: { params: { id: string } }) => {
                         text: data.post.text,
                     }}
                     onSubmit={async (values) => {
-                        const { error } = await updatePost({ updatePostId: (data?.post?.id)!, ...values });
+                        const { errors } = await updatePost({ variables: { updatePostId: (data?.post?.id)!, ...values } });
 
                         router.back();
                     }}

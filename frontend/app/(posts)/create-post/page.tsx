@@ -1,7 +1,8 @@
 "use client"
 import { InputField } from '@/components/InputField';
 import { Wrapper } from '@/components/Wrapper';
-import { useCreatePostMutation } from '@/graphql/mutations/createPost.hooks';
+import { useCreatePostMutation } from '@/graphqlApollo/generated';
+
 import { toErrorMap } from '@/utils/toErrorMap';
 import useIsAuth from '@/utils/useIsAuth';
 import { VStack, Button, Box } from '@chakra-ui/react';
@@ -12,7 +13,7 @@ import React, { useEffect, useState } from 'react'
 const CreatePost: React.FC<{}> = ({ }) => {
     const router = useRouter();
     const [mouted, setMouted] = useState(false);
-    const [, createPost] = useCreatePostMutation();
+    const [createPost] = useCreatePostMutation();
     //auto redirect if not logged in
     useIsAuth();
 
@@ -28,9 +29,10 @@ const CreatePost: React.FC<{}> = ({ }) => {
                         text: "",
                     }}
                     onSubmit={async (values) => {
-                        const { error } = await createPost({ input: values });
-
-                        router.push("/");
+                        const { errors } = await createPost({ variables: { input: values } });
+                        if (!errors) {
+                            router.push("/");
+                        }
                         //console.log(values);
                     }}
                 >
