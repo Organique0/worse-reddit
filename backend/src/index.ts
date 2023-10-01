@@ -18,6 +18,8 @@ import { UserResolver } from "./resolvers/user";
 import { PostResolver } from "./resolvers/post";
 import { MyContext } from "./types";
 import sendEmail from "../utils/sendEmail";
+import { createUserLoader } from "../utils/createUserLoader";
+import { createUpdootLoader } from "../utils/createUpdootLoader";
 
 const main = async () => {
     const app = express();
@@ -78,7 +80,7 @@ const main = async () => {
 
         bodyParser.json(),
         expressMiddleware(server, {
-            context: async ({ req, res }): Promise<MyContext> => ({ p: prisma, req, res, redis }),
+            context: async ({ req, res }): Promise<MyContext> => ({ p: prisma, req, res, redis, userLoader: createUserLoader(), updootLoader: createUpdootLoader() }),
         })
     );
 

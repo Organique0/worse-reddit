@@ -5,13 +5,14 @@ import { isAuth } from "../middleware/isAuth";
 import { randomInt } from "crypto";
 
 
-@ObjectType()
+
+/* @ObjectType()
 export class StrippedUser {
     @Field(() => String)
     username: string;
     @Field(() => Number)
     id: number;
-}
+} */
 
 @InputType()
 class PostInput {
@@ -24,15 +25,15 @@ class PostInput {
 
 @ObjectType()
 export class PaginatedPosts {
-    @Field(() => [PostWithUser])
-    posts: PostWithUser[];
+    @Field(() => [MyPost])
+    posts: MyPost[];
     @Field()
     hasMore: boolean;
     @Field(() => Number)
     _id: number;
 }
 @ObjectType()
-export class PostWithUser {
+export class MyPost {
     @Field()
     id: number
     @Field()
@@ -43,21 +44,36 @@ export class PostWithUser {
     createdAt: Date
     @Field()
     updatedAt: Date
-    //i don't know. here I am saying that we only return username and id for a user in the post
-    @Field()
-    user: StrippedUser
     @Field()
     points: number
     @Field(() => Int, { nullable: true })
-    voteStatus: number | null;
+    userId: number
 }
 
 
-@Resolver(PostWithUser)
+@Resolver(MyPost)
 export class PostResolver {
     @FieldResolver(() => String)
     textSnippet(@Root() root: Post) { //INFO: add new field that will only return first 50 characters of a post
         return root.text.slice(0, 50);
+    }
+
+    //optimized data loading for post with user
+    @FieldResolver(() => User)
+    async user(
+        @Root() post: MyPost,
+        @Ctx() { userLoader }: MyContext) {
+        return userLoader.load(post.userId);
+    }
+
+    @FieldResolver(() => Int, { nullable: true })
+    async voteStatus(
+        @Root() post: MyPost,
+        @Ctx() { updootLoader, req }: MyContext) {
+        if (!req.session.userId) return null;
+        const updoot = await updootLoader.load({ postId: post.id, userId: req.session.userId });
+
+        return updoot ? updoot.value : null;
     }
 
     @Mutation(() => Boolean)
@@ -131,12 +147,6 @@ export class PostResolver {
                 createdAt: "desc",
             },
             include: {
-                user: {
-                    select: {
-                        username: true,
-                        id: true,
-                    },
-                },
                 updoods: {
                     select: {
                         value: true, // Include the 'value' field from updoots
@@ -155,18 +165,10 @@ export class PostResolver {
                 return total + updoot.value;
             }, 0); // Initialize total to 0
 
-            let voteStatus = null;
-
-            post.updoods.map((updoot) => {
-                if ((updoot.userId === post.userId) && (updoot.postId === post.id)) {
-                    voteStatus = updoot.value
-                }
-            })
 
             return {
                 ...post,
                 points: sumOfUpdoots,
-                voteStatus: voteStatus
             };
         });
 
@@ -178,30 +180,24 @@ export class PostResolver {
         };
     }
 
-    @Query(() => PostWithUser, { nullable: true })
+    @Query(() => MyPost, { nullable: true })
     async post(
         @Arg("id", () => Int) id: number,
         @Ctx() { p }: MyContext
-    ): Promise<PostWithUser | null> {
+    ): Promise<MyPost | null> {
         const post = await p.post.findFirst({
             where: {
                 id
             },
             include: {
-                user: {
-                    select: {
-                        id: true,
-                        username: true,
-                    }
-                },
                 updoods: {
                     select: {
-                        value: true,
+                        value: true, // Include the 'value' field from updoots
                         userId: true,
-                        postId: true
+                        postId: true,
                     },
                 },
-            }
+            },
         });
 
         if (!post) return null;
@@ -210,17 +206,10 @@ export class PostResolver {
             return total + updoot.value;
         }, 0);
 
-        let voteStatus = null;
-        const x = post.updoods.map((updoot) => {
-            if ((updoot.userId === post.userId) && (updoot.postId === post.id)) {
-                voteStatus = updoot.value
-            }
-        })
 
         const postWithCountId = {
             ...post,
             points: sumOfUpdoots,
-            voteStatus: voteStatus
         };
 
         return postWithCountId;
@@ -240,7 +229,7 @@ export class PostResolver {
         });
     }
 
-    @Mutation(() => PostWithUser) // text snippet is on this type already
+    @Mutation(() => MyPost) // text snippet is on this type already
     @UseMiddleware(isAuth)
     async updatePost(
         @Arg("title") title: string,
