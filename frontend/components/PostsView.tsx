@@ -27,25 +27,20 @@ const PostsView = () => {
         fetchMore({
             variables: {
                 limit: variables?.limit,
-                cursor: data?.posts.posts[data.posts.posts.length - 1].createdAt
+                cursor: data?.posts.posts[data.posts.posts.length - 1].createdAt,
             },
-            /*             updateQuery: (prevValue, { fetchMoreResult }) => {
-                            if (!fetchMoreResult) {
-                                return prevValue
-                            }
-                            return {
-                                __typename: "Query",
-                                posts: {
-                                    __typename: "PaginatedPosts",
-                                    hasMore: fetchMoreResult.posts.hasMore,
-                                    posts: [
-                                        ...(prevValue).posts.posts,
-                                        ...(fetchMoreResult).posts.posts
-                                    ]
-                                }
-                            }
-                        } */
-        })
+            updateQuery: (prev, { fetchMoreResult }) => {
+                if (!fetchMoreResult) return prev;
+                return {
+                    ...prev,
+                    posts: {
+                        ...prev.posts,
+                        posts: [...prev.posts.posts, ...fetchMoreResult.posts.posts],
+                        hasMore: fetchMoreResult.posts.hasMore,
+                    },
+                };
+            },
+        });
     };
 
 

@@ -41,18 +41,14 @@ export function Providers({
                 Query: {
                     fields: {
                         posts: {
-                            keyArgs: [],
-                            merge(existing: PaginatedPosts | undefined, incoming: PaginatedPosts): PaginatedPosts {
-                                console.log(existing?.posts, incoming.posts)
-                                return {
-                                    ...incoming,
-                                    posts: [...(existing?.posts || []), ...(incoming?.posts || [])]
-                                };
-                            }
-                        }
-                    }
-                }
-            }
+                            keyArgs: ["limit"],
+                            merge(existing: PaginatedPosts | undefined, incoming: PaginatedPosts, { mergeObjects }): PaginatedPosts {
+                                return mergeObjects(existing, incoming);
+                            },
+                        },
+                    },
+                },
+            },
         }),
     });
 
