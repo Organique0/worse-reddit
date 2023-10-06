@@ -83,8 +83,8 @@ const main = async () => {
             context: async ({ req, res }): Promise<MyContext> => ({ p: prisma, req, res, redis, userLoader: createUserLoader(), updootLoader: createUpdootLoader() }),
         })
     );
-
-    await new Promise<void>((resolve) => httpServer.listen({ port: 8080 }, resolve));
+    const port = process.env.PORT || 8080;
+    await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
     console.log(`🚀 Server at http://localhost:4000/`);
 }
 main()
