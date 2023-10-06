@@ -7,7 +7,7 @@
     "build": "npx prisma generate && tsc",
     "watch": "tsc -w",
     "dev": "nodemon dist/src/index.js",
-    "start": "npx prisma generate && node dist/src/index.js",
+    "start": "node dist/src/index.js",
     "seed": "node prisma/data.js"
   },
   "keywords": [],
