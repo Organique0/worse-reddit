@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'worseReddit'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_63891A1C6A6F45C0903170CA68AFC0DE }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C6CE8096C1C24D8AB60C57C257D6B4A4 }}
           package: .
