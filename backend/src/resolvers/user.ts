@@ -210,7 +210,6 @@ export class UserResolver {
     @Mutation(() => UserResponse)
     async login(
         @Arg("usernameOrEmail") usernameOrEmail: string,
-        @Arg("password") password: string,
         @Ctx() { p, req }: MyContext
     ): Promise<UserResponse> {
         const user = await p.user.findFirst({
