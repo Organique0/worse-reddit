@@ -22,20 +22,28 @@ const SinglePost = ({ post }: { post: PostWithUser }) => {
                 <IconButton aria-label='up-vote' icon={<ChevronUpIcon />} onClick={async () => {
                     if (post.voteStatus === 1) return;
                     setLoading("up-loading");
-                    await vote({
-                        postId: post.id,
-                        value: 1
-                    })
+                    try {
+                        await vote({
+                            postId: post.id,
+                            value: 1
+                        })
+                    } catch (error: any) {
+                        alert(error.message)
+                    }
                     setLoading("not-loading")
                 }} isLoading={loading === "up-loading"} colorScheme={post.voteStatus === 1 ? 'green' : undefined} />
                 {post.points}
                 <IconButton aria-label='down-vote' icon={<ChevronDownIcon />} onClick={async () => {
                     if (post.voteStatus === -1) return;
                     setLoading("down-loading");
-                    await vote({
-                        postId: post.id,
-                        value: -1
-                    })
+                    try {
+                        await vote({
+                            postId: post.id,
+                            value: -1
+                        })
+                    } catch (error: any) {
+                        alert(error.message);
+                    }
                     setLoading("not-loading");
                 }} isLoading={loading === "down-loading"} colorScheme={post.voteStatus === -1 ? 'orange' : undefined} />
             </Flex>
