@@ -54,7 +54,7 @@ export const getUrqlClient = (ssr: SSRExchange) => {
 
     return createClient({
 
-        url: 'http://localhost:4000/',
+        url: process.env.URL ? process.env.URL : 'http://localhost:4000/',
         //Cookies do not get set without this line.
         fetchOptions: {
             credentials: "include" as const,
