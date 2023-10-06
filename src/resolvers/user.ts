@@ -75,7 +75,7 @@ export class UserResolver {
         const token = v4();
         await redis.set('forgot-password:' + token, user.id, 'EX', 1000 * 60 * 60 * 34 * 3); //store for 3 days
         sendEmail(email, `
-            <a href="http://localhost:3000/change-password/${token}">Reset Password</a>
+            <a href="${process.env.SERVER_URL ? process.env.SERVER_URL : "http://localhost:3000"}/change-password/${token}">Reset Password</a>
         `)
 
         return true;
