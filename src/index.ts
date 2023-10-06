@@ -84,7 +84,7 @@ const main = async () => {
         })
     );
 
-    await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve));
+    await new Promise<void>((resolve) => httpServer.listen({ port: 8080 }, resolve));
     console.log(`🚀 Server at http://localhost:4000/`);
 }
 main()
