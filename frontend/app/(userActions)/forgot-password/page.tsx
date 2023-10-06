@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { useForgotPasswordMutation } from "@/graphql/mutations/forgotPassword.hooks";
 
 
-export const ForgotPasswordPage: React.FC<{}> = ({ }) => {
+const ForgotPasswordPage = ({ }) => {
     const [mouted, setMouted] = useState(false);
     const [complete, setComplet] = useState(false);
     useEffect(() => {
