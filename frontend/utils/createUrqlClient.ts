@@ -51,10 +51,9 @@ function invalidateAllPosts(cache: Cache) {
 }
 
 export const getUrqlClient = (ssr: SSRExchange) => {
-
     return createClient({
 
-        url: process.env.URL ? process.env.URL : 'http://localhost:4000/',
+        url: 'https://worse-reddit.azurewebsites.net/', //'http://localhost:4000/',
         //Cookies do not get set without this line.
         fetchOptions: {
             credentials: "include" as const,
