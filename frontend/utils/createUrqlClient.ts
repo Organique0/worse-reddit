@@ -53,7 +53,7 @@ function invalidateAllPosts(cache: Cache) {
 export const getUrqlClient = (ssr: SSRExchange) => {
     return createClient({
 
-        url: 'https://worsereddit.azurewebsites.net/', // 'http://localhost:4000/',
+        url: 'https://worse-reddit.azurewebsites.net/',
         //Cookies do not get set without this line.
         fetchOptions: {
             credentials: "include" as const,
@@ -179,13 +179,21 @@ const simplePagination = (): Resolver<any, any, any> => {
         const isInCache = cache.resolve(cache.resolve(entityKey, fieldKey) as string, "posts");
         info.partial = !isInCache;
 
+
         const fieldInfos = allFields.filter(info => info.fieldName === fieldName);
+        //console.log(isInCache);
         const size = fieldInfos.length;
         if (size === 0) {
             return undefined;
         }
+        console.log(isInCache);
         let hasMore = true;
-        const results: string[] = [];
+        let results: string[] = [];
+        if (results.length === 0) {
+            const initialKey = cache.resolve(entityKey, fieldInfos[0].fieldKey) as string;
+            const initialData = cache.resolve(initialKey, "posts") as string[];
+            results = [...initialData];
+        }
         fieldInfos.forEach(info => {
             const key = cache.resolve(entityKey, info.fieldKey) as string;
             const data = cache.resolve(key, "posts") as string[];
@@ -193,8 +201,9 @@ const simplePagination = (): Resolver<any, any, any> => {
             if (!_hasMore) {
                 hasMore = _hasMore as boolean;
             }
+
             results.push(...data);
-        })
+        });
 
         return {
             __typename: "PaginatedPosts",

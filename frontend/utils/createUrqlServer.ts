@@ -11,7 +11,7 @@ import gql from 'graphql-tag';
 
 const getUrlServer = () => {
     return createClient({
-        url: 'https://worsereddit.azurewebsites.net/', // 'http://localhost:4000/',
+        url: 'https://worse-reddit.azurewebsites.net/',
         //Cookies do not get set without this line.
         fetchOptions: {
             credentials: "include" as const,
