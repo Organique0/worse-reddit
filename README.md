@@ -1,6 +1,9 @@
 # worse-reddit
+
+The pagination simply does not work properly. I cannot fix it.
+
 Tutorial link: https://www.youtube.com/watch?v=I6ypD7qv3Z8&t (Ben Awad).
-An old tutorial so a lot of changes had to be made but it functions the same.
+An old tutorial so some of changes had to be made.
 
 HOSTED ON AZURE AND VERCEL
 
