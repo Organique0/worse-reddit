@@ -75,7 +75,7 @@ export class UserResolver {
         const token = v4();
         await redis.set('forgot-password:' + token, user.id, 'EX', 1000 * 60 * 60 * 34 * 3); //store for 3 days
         sendEmail(email, `
-            <a href="${process.env.SERVER_URL ? process.env.SERVER_URL : "http://localhost:3000"}/change-password/${token}">Reset Password</a>
+            <a href="http://localhost:3000/change-password/${token}">Reset Password</a>
         `)
 
         return true;
@@ -210,6 +210,7 @@ export class UserResolver {
     @Mutation(() => UserResponse)
     async login(
         @Arg("usernameOrEmail") usernameOrEmail: string,
+        @Arg("password") password: string,
         @Ctx() { p, req }: MyContext
     ): Promise<UserResponse> {
         const user = await p.user.findFirst({
@@ -236,15 +237,15 @@ export class UserResolver {
             }
         }
 
-        /*         const valid = await argon2.verify(user.password, password);
-                if (!valid) {
-                    return {
-                        errors: [{
-                            field: 'password',
-                            message: 'Incorrect password'
-                        }]
-                    }
-                } */
+        const valid = await argon2.verify(user.password, password);
+        if (!valid) {
+            return {
+                errors: [{
+                    field: 'password',
+                    message: 'Incorrect password'
+                }]
+            }
+        }
         req.session.userId = user.id;
         //console.log(req.session.id);
 
