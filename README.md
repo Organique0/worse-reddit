@@ -2,6 +2,8 @@
 Tutorial link: https://www.youtube.com/watch?v=I6ypD7qv3Z8&t (Ben Awad).
 An old tutorial so a lot of changes had to be made but it functions the same.
 
+HOSTED ON AZURE AND VERCEL
+
 The most important thing for me was, that it is focused on GraphQl, which exactly what I was looking for.
 
 This is another one of those tutorials that really go deep, explain all the details and do most things by hand.
