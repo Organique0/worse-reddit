@@ -186,15 +186,24 @@ const simplePagination = (): Resolver<any, any, any> => {
         if (size === 0) {
             return undefined;
         }
-        console.log(isInCache);
         let hasMore = true;
+
         let results: string[] = [];
-        if (results.length === 0) {
-            const initialKey = cache.resolve(entityKey, fieldInfos[0].fieldKey) as string;
-            const initialData = cache.resolve(initialKey, "posts") as string[];
-            results = [...initialData];
+
+        const lastFieldInfo = fieldInfos[fieldInfos.length - 1]; // Get the last fieldInfo
+
+        if (lastFieldInfo) {
+            const key = cache.resolve(entityKey, lastFieldInfo.fieldKey) as string;
+            const data = cache.resolve(key, "posts") as string[];
+
+            // Add only the last item from the data to the existing results
+            if (data.length > 0) {
+                results = [...results, ...data.slice(1)]; // Slice to exclude the first item (which is already in 'results')
+            }
         }
+
         fieldInfos.forEach(info => {
+            //console.log(info)
             const key = cache.resolve(entityKey, info.fieldKey) as string;
             const data = cache.resolve(key, "posts") as string[];
             const _hasMore = cache.resolve(key, "hasMore");
