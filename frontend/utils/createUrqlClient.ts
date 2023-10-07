@@ -53,7 +53,7 @@ function invalidateAllPosts(cache: Cache) {
 export const getUrqlClient = (ssr: SSRExchange) => {
     return createClient({
 
-        url: 'https://worse-reddit.azurewebsites.net/',
+        url: 'http://localhost:4000',
         //Cookies do not get set without this line.
         fetchOptions: {
             credentials: "include" as const,
@@ -195,24 +195,37 @@ const simplePagination = (): Resolver<any, any, any> => {
         if (lastFieldInfo) {
             const key = cache.resolve(entityKey, lastFieldInfo.fieldKey) as string;
             const data = cache.resolve(key, "posts") as string[];
-
-            // Add only the last item from the data to the existing results
-            if (data.length > 0) {
-                results = [...results, ...data.slice(1)]; // Slice to exclude the first item (which is already in 'results')
-            }
-        }
-
-        fieldInfos.forEach(info => {
-            //console.log(info)
-            const key = cache.resolve(entityKey, info.fieldKey) as string;
-            const data = cache.resolve(key, "posts") as string[];
             const _hasMore = cache.resolve(key, "hasMore");
+
             if (!_hasMore) {
                 hasMore = _hasMore as boolean;
             }
 
-            results.push(...data);
-        });
+            if (data.length > 0) {
+                // Get the last item from the existing results
+                const lastItem = results[results.length - 1];
+
+                // Filter out any duplicates from the new data
+                const newData = data.filter((post) => post !== lastItem);
+
+                // Append the filtered new data to the existing results
+                results = [...results, ...newData];
+            }
+        }
+
+
+
+        /*         fieldInfos.forEach(info => {
+                    //console.log(info)
+                    const key = cache.resolve(entityKey, info.fieldKey) as string;
+                    const data = cache.resolve(key, "posts") as string[];
+                    const _hasMore = cache.resolve(key, "hasMore");
+                    if (!_hasMore) {
+                        hasMore = _hasMore as boolean;
+                    }
+        
+                    results.push(...data);
+                }); */
 
         return {
             __typename: "PaginatedPosts",
