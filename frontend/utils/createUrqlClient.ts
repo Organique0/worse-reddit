@@ -181,7 +181,7 @@ const simplePagination = (): Resolver<any, any, any> => {
 
 
         const fieldInfos = allFields.filter(info => info.fieldName === fieldName);
-        //console.log(isInCache);
+
         const size = fieldInfos.length;
         if (size === 0) {
             return undefined;
@@ -189,43 +189,39 @@ const simplePagination = (): Resolver<any, any, any> => {
         let hasMore = true;
 
         let results: string[] = [];
-
-        const lastFieldInfo = fieldInfos[fieldInfos.length - 1]; // Get the last fieldInfo
-
-        if (lastFieldInfo) {
-            const key = cache.resolve(entityKey, lastFieldInfo.fieldKey) as string;
-            const data = cache.resolve(key, "posts") as string[];
-            const _hasMore = cache.resolve(key, "hasMore");
-
-            if (!_hasMore) {
-                hasMore = _hasMore as boolean;
-            }
-
-            if (data.length > 0) {
-                // Get the last item from the existing results
-                const lastItem = results[results.length - 1];
-
-                // Filter out any duplicates from the new data
-                const newData = data.filter((post) => post !== lastItem);
-
-                // Append the filtered new data to the existing results
-                results = [...results, ...newData];
-            }
-        }
-
-
-
-        /*         fieldInfos.forEach(info => {
-                    //console.log(info)
-                    const key = cache.resolve(entityKey, info.fieldKey) as string;
+        /* 
+                const lastFieldInfo = fieldInfos[fieldInfos.length - 1]; // Get the last fieldInfo
+                if (lastFieldInfo) {
+                    const key = cache.resolve(entityKey, lastFieldInfo.fieldKey) as string;
                     const data = cache.resolve(key, "posts") as string[];
                     const _hasMore = cache.resolve(key, "hasMore");
+        
                     if (!_hasMore) {
                         hasMore = _hasMore as boolean;
                     }
         
-                    results.push(...data);
-                }); */
+                    if (data.length > 0) {
+                        // Append the new data to the existing results
+                        results.push(...data);
+        
+                    }
+                } */
+
+
+
+
+
+        fieldInfos.forEach(info => {
+            //console.log(info)
+            const key = cache.resolve(entityKey, info.fieldKey) as string;
+            const data = cache.resolve(key, "posts") as string[];
+            const _hasMore = cache.resolve(key, "hasMore");
+            if (!_hasMore) {
+                hasMore = _hasMore as boolean;
+            }
+
+            results.push(...data);
+        });
 
         return {
             __typename: "PaginatedPosts",
