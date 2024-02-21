@@ -28,7 +28,7 @@ const main = async () => {
 
     app.use(
         cors({
-            origin: process.env.CLIENT_URL ? process.env.CLIENT_URL : "http://localhost:4000",
+            origin: process.env.CLIENT_URL ? process.env.CLIENT_URL : "http://localhost:5000",
             credentials: true,
         })
     );
@@ -37,6 +37,7 @@ const main = async () => {
         port: 14207,
         host: process.env.REDIS_HOST,
         password: process.env.REDIS_PASSWORD,
+        connectTimeout: 10000
 
     });;
 
@@ -85,7 +86,7 @@ const main = async () => {
     );
     const port = process.env.PORT || 5000;
     await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
-    console.log(`🚀 Server at http://localhost:4000/`);
+    console.log(`🚀 Server at http://localhost:5000/`);
 }
 main()
     .then(async () => {
