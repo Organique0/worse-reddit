@@ -34,7 +34,7 @@ const main = async () => {
     );
 
     const redis = new Redis({
-        port: 14207,
+        port: parseInt(process.env.REDIS_PORT!),
         host: process.env.REDIS_HOST,
         password: process.env.REDIS_PASSWORD,
         connectTimeout: 10000
