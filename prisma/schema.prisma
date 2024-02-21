@@ -11,7 +11,7 @@ generator typegraphql {
 }
 
 datasource db {
-  provider     = "mysql"
+  provider     = "sqlserver"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
