@@ -109,7 +109,6 @@ export class PostResolver {
                     id: id
                 },
                 create: {
-                    id: id,
                     userId: userId,
                     postId: postId,
                     value: realValue,
