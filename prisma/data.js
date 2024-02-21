@@ -7,19 +7,19 @@ const path = require("path");
 //script: npm run seed
 
 const load = async () => {
-  const filePath = path.join(__dirname, "MOCK_DATA.json");
-  const jsonData = fs.readFileSync(filePath, "utf8");
-  const posts = JSON.parse(jsonData);
+	const filePath = path.join(__dirname, "MOCK_DATA.json");
+	const jsonData = fs.readFileSync(filePath, "utf8");
+	const posts = JSON.parse(jsonData);
 
-  posts.map(async (post) => {
-    await prisma.$executeRaw`insert into Post (title, text, userId, createdAt) values (${post.title}, ${post.text}, ${post.userId}, ${post.createdAt})`;
-  });
+	posts.map(async (post) => {
+		await prisma.$executeRaw`insert into Post (title, text, userId, createdAt) values (${post.title}, ${post.text}, ${post.userId}, ${post.createdAt})`;
+	});
 
-  try {
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  }
+	try {
+	} catch (e) {
+		console.error(e);
+		process.exit(1);
+	}
 };
 
 load();

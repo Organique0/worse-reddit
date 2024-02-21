@@ -1,46 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
+generator typegraphql {
+  provider         = "typegraphql-prisma"
+  contextPrismaKey = "p"
+}
+
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
-  // relationMode = "prisma" // This line is removed because MongoDB does not support relational data modeling like SQL databases
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model Post {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  text      String
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(255)
+  text      String   @db.VarChar(2047)
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  userId    String   @db.ObjectId
-  // Change Int to String for compatibility with User id type
+  updatedAt DateTime @default(now()) @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  updoods   Updoot[]
 
-  // MongoDB does not have foreign key constraints like SQL databases, so the @relation directive is removed
-  // user      User     @relation(fields: [userId], references: [id])
-
-  // No updoods relation, as MongoDB does not support joins or relational queries
-  User User @relation(fields: [userId], references: [id])
+  @@index([userId])
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  username  String   @unique
-  email     String   @unique
-  password  String
+  id        Int      @id @default(autoincrement())
+  username  String   @unique @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
+  /// @TypeGraphQL.omit(output: true, input: true)
+  password  String   @db.VarChar(255)
   posts     Post[]
   updoods   Updoot[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Updoot {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
-  postId String @db.ObjectId
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+  postId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   value  Int
 
-  // No user or post relation, as MongoDB does not support joins or relational queries
-  User User @relation(fields: [userId], references: [id])
+  @@index([userId])
+  @@index([postId])
 }
