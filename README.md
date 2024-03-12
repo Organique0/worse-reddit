@@ -6,6 +6,7 @@ Tutorial link: https://www.youtube.com/watch?v=I6ypD7qv3Z8&t (Ben Awad).
 An old tutorial so some of changes had to be made.
 
 HOSTED ON AZURE AND VERCEL
+note: Azure auto pauses my cheap db, so it may take a while for it to wake up
 
 The most important thing for me was, that it is focused on GraphQl, which exactly what I was looking for.
 
